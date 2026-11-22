@@ -17,7 +17,7 @@ _db: AsyncIOMotorDatabase | None = None
 def connect() -> AsyncIOMotorDatabase:
     global _client, _db
     s = get_settings()
-    _client = AsyncIOMotorClient(s.mongodb_uri, tz_aware=True, serverSelectionTimeoutMS=5000)
+    _client = AsyncIOMotorClient(s.mongo_url, tz_aware=True, serverSelectionTimeoutMS=5000)
     _db = _client[s.db_name]
     return _db
 
