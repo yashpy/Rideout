@@ -24,7 +24,14 @@ const MapView = dynamic(() => import("./MapView"), {
 });
 
 type Doc = { id: string } & Record<string, unknown>;
-type Need = { seats?: number; wheelchair?: number; stretcher?: number; crew?: number; lift?: boolean };
+type Need = {
+  seats?: number;
+  wheelchair?: number;
+  stretcher?: number;
+  crew?: number;
+  lift?: boolean;
+  olderAdult?: boolean;
+};
 type LonLat = [number, number];
 type Statics = { hazards: Doc[]; closures: Doc[]; shelters: Doc[]; zones: Doc[] };
 
@@ -95,6 +102,11 @@ function NeedIcons({ need }: { need?: Need }) {
       {!!need.stretcher && <span title="stretcher">stretcher</span>}
       {(need.crew ?? 1) > 1 && <span title="crew">crew {need.crew}</span>}
       {need.lift && <span title="lift">lift</span>}
+      {need.olderAdult && (
+        <span title="65 or older: planned earlier" className="rounded-full border border-line px-1.5 font-semibold text-ink">
+          65+
+        </span>
+      )}
     </span>
   );
 }

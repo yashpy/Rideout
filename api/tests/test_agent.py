@@ -91,7 +91,7 @@ async def test_full_call_fills_record_and_creates_request(client, db):
 
     req = await db.requests.find_one({"householdId": hh["_id"]})
     assert req["status"] == "received"
-    assert req["need"] == {"seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": True}
+    assert req["need"] == {"seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": True, "olderAdult": False}
 
     doc = await db.calls.find_one({"_id": "call_test"})
     speakers = [t["speaker"] for t in doc["turns"]]
@@ -291,7 +291,7 @@ async def test_first_real_phone_call_replayed(client, db):
     out = await call.say("Uh, yeah, please find a vehicle for me.")
     assert templates.STATUS["en"]["received"] in spoken(out) and out["done"]
     req = await db.requests.find_one({"householdId": hh["_id"]})
-    assert req["need"] == {"seats": 4, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": False}
+    assert req["need"] == {"seats": 4, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": False, "olderAdult": False}
 
 
 async def test_start_finds_the_call_by_conversation_id(client, db):

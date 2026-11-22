@@ -24,6 +24,7 @@ class Record(BaseModel):
     medical: list[Literal["oxygen", "dialysis", "other"]] | None = None
     pets: bool | None = None
     hasCar: bool | None = None
+    olderAdult: bool | None = None  # someone at home is 65+ (only when the caller says so)
     confidence: dict[str, float] | None = None
 
 

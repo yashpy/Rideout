@@ -170,6 +170,14 @@ def _pick_persona(rng: random.Random, groups: dict[str, list[dict[str, Any]]]) -
     return rng.choice(groups[g])
 
 
+def _truth(persona: dict[str, Any]) -> dict[str, Any]:
+    """The persona's record as a call would fill it, plus olderAdult from their age (65+)."""
+    truth = {k: v for k, v in (persona.get("truth") or {}).items() if v is not None}
+    if (persona.get("age") or 0) >= 65:
+        truth["olderAdult"] = True
+    return truth
+
+
 def _priority(record: dict[str, Any], need: dict[str, Any]) -> float:
     """Same spirit as the agent's transparent score: heavier needs and medical needs go first."""
     return (
@@ -178,6 +186,7 @@ def _priority(record: dict[str, Any], need: dict[str, Any]) -> float:
         + 3 * (need.get("stretcher") or 0)
         + (1 if need.get("lift") else 0)
         + 1.5 * len(record.get("medical") or [])
+        + (1 if record.get("olderAdult") else 0)
     )
 
 
@@ -393,11 +402,11 @@ async def instant_census(
         by_persona.setdefault(pid, []).append(hh["_id"])
         expect = _persona(pid).get("expect") or {}
         if expect.get("role") == "needs_ride":
-            truth = {k: v for k, v in (_persona(pid).get("truth") or {}).items() if v is not None}
+            truth = _truth(_persona(pid))
             riders.append((hh, truth, expect))
     for pid, ids in by_persona.items():  # one write per persona, not per home
         p = _persona(pid)
-        truth = {k: v for k, v in (p.get("truth") or {}).items() if v is not None}
+        truth = _truth(p)
         role = (p.get("expect") or {}).get("role") or "unknown"
         await db.households.update_many(
             {"_id": {"$in": ids}, "reach": "not_called"},
@@ -412,6 +421,7 @@ async def instant_census(
             "crew": 1,
             "lift": False,
             **(expect.get("need") or {}),
+            "olderAdult": bool(truth.get("olderAdult")),
         }
         items.append(
             {

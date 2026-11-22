@@ -439,6 +439,7 @@ def compute_need(record: dict[str, Any], state: dict[str, Any] | None = None) ->
         "stretcher": 1 if bed else 0,
         "crew": 2 if (lift_help or bed) else 1,
         "lift": bool(mob == "power_wheelchair" or bed or (state and state.get("chairPending"))),
+        "olderAdult": bool(record.get("olderAdult")),
     }
 
 
@@ -450,6 +451,8 @@ def compute_priority(record: dict[str, Any], escalation: str | None = None) -> f
     )
     score += 1.5 * len(record.get("medical") or [])
     if record.get("assistance") == "two_person_lift":
+        score += 1
+    if record.get("olderAdult"):
         score += 1
     if escalation in LIFE_THREATS:
         score += 5
