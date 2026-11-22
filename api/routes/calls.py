@@ -1,4 +1,4 @@
-"""Calls: the call floor reads and POST /calls/dial."""
+"""Calls: the call floor reads, POST /calls/dial, /calls/kiosk and /calls/web."""
 
 from datetime import timedelta
 from typing import Any
@@ -11,7 +11,7 @@ from api import audit, persona
 from api import requests as rq
 from api.agent import dialer
 from api.core.db import get_db
-from api.core.util import utcnow
+from api.core.util import new_id, utcnow
 from api.routes._util import out, place_visitor
 
 router = APIRouter(prefix="/calls", tags=["calls"])
@@ -152,3 +152,61 @@ async def dial(body: DialBody) -> dict:
     except dialer.DialError as e:
         raise HTTPException(e.status, str(e)) from e
     return {"callId": call_id}
+
+
+class WebBody(BaseModel):
+    householdId: str | None = None  # empty: we pick a simulated home that hasn't been reached yet
+    language: str = Field(default="en", pattern=r"^(en|es)$")
+
+
+WEB_PER_MINUTE = 6  # public button; each session costs ElevenLabs minutes
+
+
+@router.post("/web")
+async def web_call(body: WebBody) -> dict:
+    """ "Talk to RideOut" in the browser: the visitor plays one simulated home over an ElevenLabs voice session.
+
+    The house starts fresh so the visitor's answers fill its record, and it is marked busy so no stand-in
+    calls it meanwhile. The browser passes the ids to ElevenLabs as dynamic variables; the voice relay
+    (voice/main.py) then calls /agent/start and /agent/turn with them, exactly like a phone call.
+    → {householdId, callId, address, language}
+    """
+    db = get_db()
+    now = utcnow()
+    recent = await db.auditLog.count_documents({"kind": "web_call", "at": {"$gt": now - timedelta(minutes=1)}})
+    if recent >= WEB_PER_MINUTE:
+        raise HTTPException(429, "lots of people are talking to RideOut; try again in a minute")
+    if body.householdId:
+        hh = await db.households.find_one({"_id": body.householdId})
+        if hh is None:
+            raise HTTPException(404, "household not found")
+    else:
+        hh = await db.households.find_one(
+            {"simulated": True, "reach": "not_called"}, sort=[("fireArrivalAt", 1)]
+        ) or await db.households.find_one({"simulated": True, "reach": {"$nin": list(dialer.BUSY)}})
+        if hh is None:
+            raise HTTPException(409, "no demo homes loaded; press Seed in the console first")
+    if hh.get("reach") in dialer.BUSY:
+        raise HTTPException(409, "this house is on a call right now; pick another one")
+    req = await db.requests.find_one({"householdId": hh["_id"], "status": {"$in": list(rq.OPEN_STATUSES)}})
+    if req is not None:
+        if req["status"] != "received":
+            raise HTTPException(409, "this house already has a driver on the way; pick another one")
+        await rq.transition(db, req["_id"], "closed", reason="web voice: a visitor plays this home", by="web")
+    await db.households.update_one(
+        {"_id": hh["_id"]},
+        {
+            "$set": {
+                "record": {},
+                "corrections": [],
+                "reach": "ringing",  # busy: stand-ins and the dialer leave it alone
+                "role": "unknown",
+                "language": body.language,
+                "webVoiceAt": now,
+                "updatedAt": now,
+            }
+        },
+    )
+    call_id = f"call_web_{new_id('c')}"
+    await audit.log(db, "web_call", hh.get("address", ""), householdId=hh["_id"], callId=call_id)
+    return {"householdId": hh["_id"], "callId": call_id, "address": hh.get("address"), "language": body.language}

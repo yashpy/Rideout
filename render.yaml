@@ -1,6 +1,4 @@
-# Render Blueprint: free API. Render dashboard → New → Blueprint → this repo.
-# The voice relay (voice/) is only needed for real phone calls; add it as a second free Docker
-# service (dockerContext ./voice) once ElevenLabs is set up, with PUBLIC_API_URL = this API's URL.
+# Render Blueprint: free API + free voice relay (ElevenLabs custom LLM). Render dashboard → New → Blueprint.
 # Free web services sleep after ~15 min idle (background workers pause too) and wake on the next request.
 services:
   - type: web
@@ -27,3 +25,21 @@ services:
       - key: GEMINI_API_KEY
         sync: false # optional; without it the free rule interpreter is used
 
+  - type: web
+    name: rideout-voice
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./voice/Dockerfile
+    dockerContext: ./voice
+    healthCheckPath: /health
+    envVars:
+      - key: PUBLIC_API_URL # the API's Render URL (rideout-api.onrender.com belongs to someone else)
+        value: https://rideout-api-grg6.onrender.com
+      - key: INTERNAL_TOKEN
+        fromService:
+          type: web
+          name: rideout-api
+          envVarKey: INTERNAL_TOKEN
+      - key: VOICE_LLM_SECRET # copy into the ElevenLabs agent's custom LLM API key (a workspace secret)
+        generateValue: true

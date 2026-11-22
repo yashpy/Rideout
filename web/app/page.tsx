@@ -62,6 +62,7 @@ const STEPS = [
 ];
 
 const SCREENS = [
+  { href: "/talk", title: "Talk to RideOut", body: "Speak to the real voice agent in your browser as a resident. Watch the record fill in as you talk." },
   { href: "/try", title: "Try it", body: "Enter your phone number and your address, then take the call as a resident or join as a driver." },
   { href: "/console", title: "Dispatch console", body: "The live map: requests by deadline, the plan to approve, the fleet, and Play evacuation." },
   { href: "/calls", title: "Call floor", body: "Every call in progress, its transcript streaming in, and the household record filling as people talk." },
@@ -333,8 +334,8 @@ export default function Landing() {
                 Play a resident who can&apos;t get out, or a neighbor with a free seat. It takes two minutes.
               </p>
             </div>
-            <Link href="/try" className="btn btn-primary btn-lg">
-              Try it now <Arrow />
+            <Link href="/talk" className="btn btn-primary btn-lg">
+              Talk to RideOut <Arrow />
             </Link>
           </div>
         </section>
