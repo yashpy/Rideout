@@ -4,9 +4,7 @@ name: deploy
 # The web app is deployed by Vercel from the same branches.
 # Rollback: run this workflow by hand with an older image tag.
 on:
-  push:
-    branches: [develop, staging, main]
-    paths: ["data/**", "api/**", "infra/**", ".github/workflows/deploy.yml"]
+  # Manual only: the Vultr VM is not set up (RideOut runs on free Render + Vercel, see render.yaml).
   workflow_dispatch:
     inputs:
       env:

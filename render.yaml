@@ -1,0 +1,45 @@
+# Render Blueprint: free API + voice relay. Render dashboard → New → Blueprint → this repo.
+# Free web services sleep after ~15 min idle (background workers pause too) and wake on the next request.
+services:
+  - type: web
+    name: rideout-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./infra/render/api.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ENV
+        value: prod
+      - key: MONGODB_URI
+        sync: false # paste the MongoDB Atlas connection string when Render asks
+      - key: INTERNAL_TOKEN
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: PUBLIC_API_URL
+        value: https://rideout-api.onrender.com
+      - key: PUBLIC_WEB_URL
+        value: https://rideout-nine.vercel.app
+      - key: GEMINI_API_KEY
+        sync: false # optional; without it the free rule interpreter is used
+
+  - type: web
+    name: rideout-voice
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./voice/Dockerfile
+    dockerContext: ./voice
+    healthCheckPath: /health
+    envVars:
+      - key: PUBLIC_API_URL
+        value: https://rideout-api.onrender.com
+      - key: INTERNAL_TOKEN
+        fromService:
+          type: web
+          name: rideout-api
+          envVarKey: INTERNAL_TOKEN
+      - key: VOICE_LLM_SECRET
+        generateValue: true
