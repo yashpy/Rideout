@@ -131,6 +131,7 @@ Auth: dashboard and driver endpoints are open (no sign-in yet). `/agent/*` and w
 | POST | `/agent/turn` | `{callId, householdId, text, language}` → `{say: [str], stage, done, record, requestStatus}` |
 | POST | `/calls/kiosk` | `{householdId, phone: +1XXXXXXXXXX, address?, lon?, lat?}` (*added:* a typed, geocoded address moves the house there; 422 if more than 2.5 km away) → `{callId, householdId, address}`: the house becomes the caller's real phone, then is dialed. 429 above 6/min |
 | POST | `/calls/dial` | `{householdId}` → `{callId}` (real call via ElevenLabs, or stand-in) |
+| POST | `/calls/web` | *added:* `{householdId?, language?: en|es}` → `{householdId, callId, address, language}`: a simulated home prepared for a browser voice session (ElevenLabs widget → voice relay → `/agent/*`). 409 busy house, 429 above 6/min |
 | GET | `/calls?limit=` | → `[call summary + household]`, most recently active first |
 | GET | `/calls/{id}` | → call summary + `turns` + open `request` |
 | PATCH | `/households/{id}/record` | partial record → household |

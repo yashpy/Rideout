@@ -63,6 +63,7 @@ export function recordRows(r: HouseholdRecord | undefined): { key: string; label
       value: rec.medical === undefined ? undefined : rec.medical.length ? rec.medical.join(", ") : "None",
     },
     { key: "assistance", label: "Help out", value: rec.assistance && ASSISTANCE[rec.assistance] },
+    { key: "olderAdult", label: "Age 65+", value: rec.olderAdult ? "Yes" : undefined },
   ];
 }
 
