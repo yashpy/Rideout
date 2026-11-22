@@ -122,3 +122,11 @@ async def test_unexpected_errors_are_readable_and_keep_cors(db, monkeypatch):
     assert res.status_code == 500
     assert res.json() == {"detail": "RuntimeError: database said no"}
     assert res.headers.get("access-control-allow-origin") in ("*", "https://rideout.vercel.app")
+
+
+def test_mongodb_password_is_filled_into_the_uri():
+    from api.core.config import Settings
+
+    s = Settings(mongodb_uri="mongodb+srv://u:<db_password>@h/?w=majority", mongodb_password="p@ss/1")
+    assert s.mongo_url == "mongodb+srv://u:p%40ss%2F1@h/?w=majority"
+    assert Settings(mongodb_uri="mongodb://localhost:27017").mongo_url == "mongodb://localhost:27017"

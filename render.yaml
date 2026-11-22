@@ -14,8 +14,10 @@ services:
     envVars:
       - key: ENV
         value: prod
-      - key: MONGODB_URI
-        sync: false # paste the MongoDB Atlas connection string when Render asks
+      - key: MONGODB_URI # not secret: the password is filled in from MONGODB_PASSWORD
+        value: mongodb+srv://rideout:<db_password>@cluster0.7ozxkbz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: MONGODB_PASSWORD
+        sync: false # paste the Atlas password for user `rideout` when Render asks
       - key: INTERNAL_TOKEN
         generateValue: true
       - key: CORS_ORIGINS
