@@ -1,0 +1,67 @@
+{
+  "name": "pocket-fire",
+  "title": "Pocket Fire, Oak Creek Canyon, Coconino County, AZ (June 19 - July 30, 2026)",
+  "timezone": "America/Phoenix",
+  "ignitionAt": "2026-06-19T17:01:00-07:00",
+  "ignition": [-111.78, 34.97],
+  "ignitionNote": "APPROXIMATE. No official origin coordinates were published that we could reach. Placed from the official description: about 7 miles north of Sedona, above the western rim of Oak Creek Canyon, near East Pocket (Red Rock-Secret Mountain Wilderness). Sources S-02, S-04. Replace with the InciWeb/IRWIN origin when available.",
+  "zones": [
+    { "id": "zone_oak_creek_14", "name": "Oak Creek Canyon (Coconino County EM zone 14)", "county": "Coconino" },
+    { "id": "zone_oak_creek_15", "name": "Oak Creek Canyon (Coconino County EM zone 15)", "county": "Coconino" }
+  ],
+  "road": {
+    "id": "sr89a_oak_creek",
+    "name": "State Route 89A",
+    "segment": "Fort Tuthill (Flagstaff) to the north end of Sedona, mileposts 374-397, both directions (about 23 miles)",
+    "mainRoadOut": true
+  },
+  "shelter": {
+    "name": "American Red Cross shelter, Sedona Red Rock High School",
+    "address": "995 Upper Red Rock Loop Rd, Sedona, AZ 86336",
+    "openedBy": "2026-06-19T22:00:00-07:00",
+    "source": "S-05"
+  },
+  "homes": {
+    "housingUnits": 1197,
+    "occupiedHouseholds": 650,
+    "note": "Census ACS 2019-2023, Tract 16.02 (covers the canyon from Midgley Bridge to Pine Flat). 46% of units are vacant, mostly seasonal homes. No official count of homes evacuated was published.",
+    "source": "C-01"
+  },
+  "wind": {
+    "speedMps": 11.2,
+    "gustMps": 22.4,
+    "fromDeg": 225,
+    "note": "gustMps = 'wind gusts exceeding 50 mph' during the Red Flag event at ignition (S-02). fromDeg 225 (SW) is inferred from winds pushing the fire north-east along FR 231 (S-12). speedMps (25 mph sustained) is OUR ASSUMPTION for the spread model, not a published number."
+  },
+  "events": [
+    { "t": "2026-06-19T19:15:00-07:00", "tMin": 134, "type": "acres", "acres": 100, "source": "S-03" },
+    { "t": "2026-06-19T19:15:00-07:00", "tMin": 134, "type": "closure", "action": "close", "roadId": "sr89a_oak_creek", "segment": "Fort Tuthill to north end of Sedona", "source": "S-03", "note": "Closure was in place by the 7:15 p.m. release; exact closure minute not published." },
+    { "t": "2026-06-19T19:16:00-07:00", "tMin": 135, "type": "go", "zoneIds": ["zone_oak_creek_14", "zone_oak_creek_15"], "area": "All residents and visitors between Sedona and Forest Highlands", "source": "S-04,S-06", "note": "Straight to GO, no SET stage first. 7:16 p.m. per Flagscanner; one outlet says the formal order was 'around 10 PM'. Treat the minute as approximate." },
+    { "t": "2026-06-19T21:20:00-07:00", "tMin": 259, "type": "acres", "acres": 500, "source": "S-05" },
+    { "t": "2026-06-21T12:00:00-07:00", "tMin": 2579, "type": "acres", "acres": 293, "source": "S-07", "note": "Lower than 500 because of better mapping, not shrinkage." },
+    { "t": "2026-06-22T11:00:00-07:00", "tMin": 3959, "type": "acres", "acres": 257, "source": "S-08", "note": "Infrared flight remapped the perimeter." },
+    { "t": "2026-06-23T08:00:00-07:00", "tMin": 5219, "type": "set", "zoneIds": ["zone_oak_creek_14", "zone_oak_creek_15"], "source": "S-09", "note": "GO downgraded to SET. Residents only, with proof of residence." },
+    { "t": "2026-06-23T08:00:00-07:00", "tMin": 5219, "type": "closure", "action": "residents_only", "roadId": "sr89a_oak_creek", "source": "S-09" },
+    { "t": "2026-06-23T12:00:00-07:00", "tMin": 5459, "type": "wind", "speedMps": 20.1, "fromDeg": 135, "gust": true, "source": "S-09", "note": "Forecast: winds swing to the south-east, aligned with Oak Creek Canyon, gusts to 45 mph." },
+    { "t": "2026-06-25T09:00:00-07:00", "tMin": 8159, "type": "acres", "acres": 1187, "source": "S-10" },
+    { "t": "2026-06-26T08:00:00-07:00", "tMin": 9539, "type": "acres", "acres": 1467, "source": "S-11" },
+    { "t": "2026-06-27T19:00:00-07:00", "tMin": 11639, "type": "acres", "acres": 2349, "source": "S-12" },
+    { "t": "2026-06-28T12:00:00-07:00", "tMin": 12659, "type": "acres", "acres": 6015, "source": "S-12" },
+    { "t": "2026-06-30T12:00:00-07:00", "tMin": 15539, "type": "set", "zoneIds": ["zone_kachina_village", "zone_forest_highlands", "zone_pine_dell"], "source": "S-02,S-13", "note": "Flagstaff-side communities put in SET as the fire ran north into West Fork." },
+    { "t": "2026-07-01T12:00:00-07:00", "tMin": 16979, "type": "acres", "acres": 17000, "source": "S-14", "note": "Reported as '17K-acre'." },
+    { "t": "2026-07-08T12:47:00-07:00", "tMin": 27106, "type": "acres", "acres": 27440, "source": "S-15" },
+    { "t": "2026-07-13T08:00:00-07:00", "tMin": 34019, "type": "closure", "action": "reopen", "roadId": "sr89a_oak_creek", "source": "S-02,S-16", "note": "SR 89A closed 25 days (6/19 to 7/13). Reopen hour approximate ('Monday morning')." },
+    { "t": "2026-07-30T08:00:00-07:00", "tMin": 58499, "type": "acres", "acres": 27393, "contained": 100, "source": "S-02", "note": "Final official size; 100% contained July 30." }
+  ],
+  "replay": {
+    "note": "The real fire unfolded over days. This is a compressed replay: SET at t=0, first acres at +20 s, SR 89A closure at +105 s, GO at +110 s. Any on-screen use carries the 'simulated' badge. For reference, the real canyon went straight to GO about 2 h 15 min after the fire was reported, with no SET warning.",
+    "compressed": [
+      { "tSec": 0, "type": "set", "zoneIds": ["zone_oak_creek_14", "zone_oak_creek_15"] },
+      { "tSec": 20, "type": "acres", "acres": 100 },
+      { "tSec": 60, "type": "acres", "acres": 500 },
+      { "tSec": 105, "type": "closure", "action": "close", "roadId": "sr89a_oak_creek" },
+      { "tSec": 110, "type": "go", "zoneIds": ["zone_oak_creek_14", "zone_oak_creek_15"] }
+    ]
+  },
+  "sourcesFile": "docs/sources.md"
+}

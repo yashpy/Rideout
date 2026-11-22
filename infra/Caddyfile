@@ -1,0 +1,16 @@
+# Auto-HTTPS for each API environment. Point A records for these names at the VM.
+# WebSockets (/live) pass through reverse_proxy with no extra config.
+api-dev.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api-dev:8000
+}
+
+api-staging.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api-staging:8000
+}
+
+api.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api-prod:8000
+}

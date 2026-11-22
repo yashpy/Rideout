@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [develop, staging, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    services:
+      mongo:
+        image: mongo:7
+        ports: ["27017:27017"]
+      timescale: # Tiger Data's engine: tests/test_fire.py runs against a real hypertable
+        image: timescale/timescaledb:latest-pg16
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      MONGODB_TEST_URI: mongodb://localhost:27017
+      TIGER_TEST_URL: postgres://postgres:test@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - name: pytest (real MongoDB + TimescaleDB, so atomic accept and the fire hypertable are proven)
+        run: uv run pytest
+
+  voice:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: voice
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: voice/uv.lock
+      - run: uv sync --frozen
+      - run: uvx ruff check . && uvx ruff format --check .
+      - run: uv run pytest -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: https://api-dev.example.invalid

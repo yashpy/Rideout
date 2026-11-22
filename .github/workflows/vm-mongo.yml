@@ -1,0 +1,86 @@
+name: vm-mongo
+
+# One button (Actions → vm-mongo → Run workflow) to point an env's API at the MongoDB on the VM, or back
+# at Atlas. Uses the same SSH secrets as deploy. The Atlas URI is kept on the VM in <env>.env.atlas
+# (mode 600) the first time, so "atlas" puts it back. Secrets never appear in the logs.
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+      to:
+        description: Database
+        type: choice
+        options: [vm, atlas]
+        required: true
+      seed:
+        description: Seed the default world afterwards (a fresh VM database is empty)
+        type: boolean
+        default: true
+
+concurrency:
+  group: vm-mongo
+  cancel-in-progress: false
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy compose files to the VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VULTR_HOST }}
+          username: ${{ secrets.VULTR_USER }}
+          key: ${{ secrets.VULTR_SSH_KEY }}
+          source: infra/docker-compose.yml,infra/Caddyfile,infra/deploy.sh
+          target: /opt/rideout
+          strip_components: 1
+      - name: Switch database
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          SW_ENV: ${{ inputs.env }}
+          SW_TO: ${{ inputs.to }}
+          SW_SEED: ${{ inputs.seed }}
+        with:
+          host: ${{ secrets.VULTR_HOST }}
+          username: ${{ secrets.VULTR_USER }}
+          key: ${{ secrets.VULTR_SSH_KEY }}
+          envs: SW_ENV,SW_TO,SW_SEED
+          script: |
+            set -euo pipefail
+            cd /opt/rideout
+            F="$SW_ENV.env"
+            VM_URI='MONGODB_URI=mongodb://mongo:27017/?replicaSet=rs0'
+            docker compose up -d --wait mongo
+            # Keep the Atlas line once, before the first switch (never overwrite it with the VM line).
+            if [ ! -f "$F.atlas" ] && grep -q '^MONGODB_URI=' "$F" && ! grep -q '^MONGODB_URI=mongodb://mongo:' "$F"; then
+              grep '^MONGODB_URI=' "$F" > "$F.atlas"; chmod 600 "$F.atlas"
+            fi
+            if [ "$SW_TO" = vm ]; then
+              LINE="$VM_URI"
+            else
+              [ -f "$F.atlas" ] || { echo "no saved Atlas URI for $SW_ENV; nothing to restore" >&2; exit 1; }
+              LINE="$(cat "$F.atlas")"
+            fi
+            { grep -v '^MONGODB_URI=' "$F" || true; printf '%s\n' "$LINE"; } > "$F.new"
+            chmod 600 "$F.new"; mv "$F.new" "$F"
+            echo "api-$SW_ENV now uses: $(sed -E 's#^MONGODB_URI=([a-z+]+)://([^@/]*@)?([^/?]*).*#\1://\3#' <<<"$LINE")"
+            docker compose up -d "api-$SW_ENV"
+            for _ in $(seq 1 30); do
+              if docker compose exec -T "api-$SW_ENV" python -c \
+                  "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')" 2>/dev/null; then
+                if [ "$SW_SEED" = true ]; then
+                  docker compose exec -T "api-$SW_ENV" python -c \
+                    "import urllib.request;print(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/sim/seed',method='POST'),timeout=120).read()[:300])"
+                fi
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "api-$SW_ENV did not become healthy" >&2
+            docker compose logs --tail 80 "api-$SW_ENV" >&2
+            exit 1

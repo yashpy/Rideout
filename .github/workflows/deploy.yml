@@ -1,0 +1,131 @@
+name: deploy
+
+# Push to develop / staging / main → build the API image → SSH to the Vultr VM → compose up api-<env>.
+# The web app is deployed by Vercel from the same branches.
+# Rollback: run this workflow by hand with an older image tag.
+on:
+  push:
+    branches: [develop, staging, main]
+    paths: ["data/**", "api/**", "infra/**", ".github/workflows/deploy.yml"]
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+      tag:
+        description: Image tag to deploy (a git sha). Empty = build this commit.
+        required: false
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.p.outputs.env }}
+      ghenv: ${{ steps.p.outputs.ghenv }}
+      tag: ${{ steps.p.outputs.tag }}
+      build: ${{ steps.p.outputs.build }}
+      image: ${{ steps.p.outputs.image }}
+    steps:
+      - id: p
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ inputs.env }}"
+          else
+            case "${{ github.ref_name }}" in
+              develop) ENV=dev ;; staging) ENV=staging ;; main) ENV=prod ;;
+            esac
+          fi
+          GHENV=$([ "$ENV" = prod ] && echo production || echo "$ENV")
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then TAG="${GITHUB_SHA::7}"; BUILD=true; else BUILD=false; fi
+          echo "env=$ENV" >> "$GITHUB_OUTPUT"
+          echo "ghenv=$GHENV" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+          # Image names must be lowercase (the repo owner may have capitals).
+          echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/rideout-api" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: api
+          build-contexts: data=data  # scenario + personas for /sim/seed → /app/data
+          push: true
+          build-args: GIT_SHA=${{ needs.plan.outputs.tag }}
+          tags: |
+            ${{ needs.plan.outputs.image }}:${{ needs.plan.outputs.tag }}
+            ${{ needs.plan.outputs.image }}:${{ needs.plan.outputs.env }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: [plan, build]
+    if: always() && needs.plan.result == 'success' && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment: ${{ needs.plan.outputs.ghenv }}
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      # Until the Vultr VM exists, skip instead of failing: the image is still built and pushed.
+      - name: VM configured?
+        id: vm
+        env:
+          HOST: ${{ secrets.VULTR_HOST }}
+          KEY: ${{ secrets.VULTR_SSH_KEY }}
+        run: |
+          if [ -n "$HOST" ] && [ -n "$KEY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Deploy skipped::VULTR_HOST / VULTR_SSH_KEY not set yet. Image ${{ needs.plan.outputs.image }}:${{ needs.plan.outputs.tag }} is built; add the secrets (infra/README.md, Go-live checklist) and re-run."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.vm.outputs.ready == 'true'
+      - name: Copy compose files to the VM
+        if: steps.vm.outputs.ready == 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VULTR_HOST }}
+          username: ${{ secrets.VULTR_USER }}
+          key: ${{ secrets.VULTR_SSH_KEY }}
+          source: infra/docker-compose.yml,infra/Caddyfile,infra/deploy.sh
+          target: /opt/rideout
+          strip_components: 1
+      - name: Compose up
+        if: steps.vm.outputs.ready == 'true'
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_ENV: ${{ needs.plan.outputs.env }}
+          DEPLOY_TAG: ${{ needs.plan.outputs.tag }}
+        with:
+          host: ${{ secrets.VULTR_HOST }}
+          username: ${{ secrets.VULTR_USER }}
+          key: ${{ secrets.VULTR_SSH_KEY }}
+          envs: GHCR_USER,GHCR_TOKEN,DEPLOY_ENV,DEPLOY_TAG
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            chmod +x /opt/rideout/deploy.sh
+            /opt/rideout/deploy.sh "$DEPLOY_ENV" "$DEPLOY_TAG"

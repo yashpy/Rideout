@@ -1,0 +1,26 @@
+[project]
+name = "rideout-voice"
+version = "0.0.1"
+description = "ElevenLabs Agents custom-LLM relay: forwards each caller turn to /agent/turn and speaks back what the API returns"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "httpx>=0.28.1",
+    "uvicorn>=0.30.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.24"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

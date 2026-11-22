@@ -1,0 +1,1052 @@
+[
+  {
+    "id": "p01",
+    "name": "Rosa Delgado",
+    "age": 81,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "power_wheelchair",
+      "assistance": "two_person_lift",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Hello? Yes, this is Rosa.",
+      "No, I don't think I can leave on my own.",
+      "It's just me.",
+      "Oh wait, I'm sorry. My husband is here. He's in a power chair. He needs two people to lift him.",
+      "We don't have a car anymore.",
+      "No pets. Is someone coming?"
+    ],
+    "correction": "peopleCount 1 -> 2; mobility walks -> power_wheelchair; assistance -> two_person_lift",
+    "tricky": "pushes for a promise",
+    "expect": {
+      "role": "needs_ride",
+      "need": {
+        "seats": 2,
+        "wheelchair": 1,
+        "crew": 2,
+        "lift": true
+      },
+      "mustNotSay": [
+        "coming",
+        "on the way",
+        "minutes"
+      ]
+    }
+  },
+  {
+    "id": "p02",
+    "name": "Harold Brandt",
+    "age": 88,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [
+        "oxygen"
+      ],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Yes?",
+      "I use a walker and I'm on oxygen.",
+      "It's only me here.",
+      "I gave up driving two years ago.",
+      "I'd need someone to help me down the steps."
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p03",
+    "name": "Margaret Ellison",
+    "age": 79,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Who is this?",
+      "WHAT? Can you say that again, louder?",
+      "Leave? I can't hear you, dear.",
+      "Oh. Yes. I live alone. I have a car but I can't see well enough to drive at night.",
+      "I have a cat, Biscuit."
+    ],
+    "tricky": "hard of hearing",
+    "expect": {
+      "role": "needs_ride",
+      "flags": [
+        "asks_repeat"
+      ]
+    }
+  },
+  {
+    "id": "p04",
+    "name": "Walter Ng",
+    "age": 92,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "bedbound",
+      "assistance": "two_person_lift",
+      "medical": [
+        "oxygen"
+      ],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "This is his daughter, Linda, I'm on the phone for him.",
+      "Dad is bedbound. He's on oxygen.",
+      "I'm in Phoenix. He's alone right now until the aide comes at six.",
+      "He'll need a stretcher or two people."
+    ],
+    "expect": {
+      "role": "needs_ride",
+      "need": {
+        "stretcher": 1,
+        "crew": 2
+      },
+      "escalation": "medical"
+    }
+  },
+  {
+    "id": "p05",
+    "name": "Dolores Vega",
+    "age": 84,
+    "language": "es",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": false
+    },
+    "script": [
+      "¿Bueno?",
+      "No hablo inglés.",
+      "Vivo sola. Uso andadera.",
+      "No tengo carro.",
+      "Tengo un perrito, no lo voy a dejar."
+    ],
+    "tricky": "speaks Spanish only",
+    "expect": {
+      "role": "needs_ride",
+      "language": "es"
+    }
+  },
+  {
+    "id": "p06",
+    "name": "George Pappas",
+    "age": 76,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "manual_wheelchair",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Yeah, this is George.",
+      "My wife's in a wheelchair, the folding kind.",
+      "I can push her but I can't get her and the chair into the truck by myself with my back.",
+      "It's the two of us and the dog.",
+      "I'm not leaving Max. He comes or we stay."
+    ],
+    "tricky": "won't leave without dog",
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p07",
+    "name": "Evelyn Marsh",
+    "age": 83,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [
+        "dialysis"
+      ],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Hello.",
+      "I have dialysis tomorrow morning in Cottonwood.",
+      "I have a car, but my daughter drives me. I don't drive on the switchbacks.",
+      "Just me.",
+      "When will someone be here? I need to know a time."
+    ],
+    "tricky": "pushes for a promise",
+    "expect": {
+      "role": "needs_ride",
+      "flags": [
+        "wants_time"
+      ]
+    }
+  },
+  {
+    "id": "p08",
+    "name": "Frank Odom",
+    "age": 71,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "manual_wheelchair",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Frank here.",
+      "I'm a below-knee amputee, I use a wheelchair most days.",
+      "No car, I sold it.",
+      "I can transfer if someone holds the chair.",
+      "Nobody else here."
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p09",
+    "name": "Ruth Calloway",
+    "age": 95,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [
+        "other"
+      ],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Hello?",
+      "My son lives with me. He has Down syndrome, he's 60.",
+      "I use a walker. He walks fine but he won't go without me.",
+      "We don't drive.",
+      "So two of us."
+    ],
+    "expect": {
+      "role": "needs_ride",
+      "need": {
+        "seats": 2
+      }
+    }
+  },
+  {
+    "id": "p10",
+    "name": "Tomás Ibarra",
+    "age": 67,
+    "language": "es",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 3,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Sí, buenas tardes.",
+      "Somos tres: yo, mi esposa y mi suegra.",
+      "Mi suegra tiene 90 años y camina muy despacio.",
+      "No tenemos carro, se descompuso ayer.",
+      "¿Cuándo llegan?"
+    ],
+    "tricky": "speaks Spanish only",
+    "expect": {
+      "role": "needs_ride",
+      "language": "es",
+      "need": {
+        "seats": 3
+      }
+    }
+  },
+  {
+    "id": "p11",
+    "name": "Irene Kowalski",
+    "age": 74,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [
+        "oxygen"
+      ],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Yes, hello.",
+      "I'm on oxygen, I have a portable tank with about three hours.",
+      "I walk fine but I don't have a car.",
+      "Just me."
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p12",
+    "name": "Leonard Fisk",
+    "age": 89,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "power_wheelchair",
+      "assistance": "two_person_lift",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Fisk.",
+      "I'm in a power chair. It weighs three hundred pounds.",
+      "You'd need a van with a ramp or two strong people.",
+      "I'm by myself.",
+      "Are you sending someone or not? Yes or no."
+    ],
+    "tricky": "pushes for a promise",
+    "expect": {
+      "role": "needs_ride",
+      "mustNotSay": [
+        "yes",
+        "coming"
+      ]
+    }
+  },
+  {
+    "id": "p13",
+    "name": "Agnes Whitfield",
+    "age": 86,
+    "language": "en",
+    "truth": {
+      "canLeave": "unsure",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Oh, I don't know.",
+      "I have a car, but I haven't driven it since my hip.",
+      "Maybe my neighbor can take me, I'm not sure he's home.",
+      "I have two birds."
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p14",
+    "name": "Samuel Rourke",
+    "age": 63,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": false
+    },
+    "script": [
+      "Yep.",
+      "No car, I bike into town.",
+      "Can't bike out in this smoke.",
+      "Me and my dog, Juniper. She's big, sixty pounds.",
+      "She comes with me."
+    ],
+    "tricky": "won't leave without dog",
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p15",
+    "name": "Beatrice Lam",
+    "age": 78,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [
+        "other"
+      ],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Hello?",
+      "I have dementia, my aide wrote it on the fridge for me.",
+      "There's a car but I don't have the keys.",
+      "I'm here by myself. My aide comes back tonight."
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p16",
+    "name": "Carl Henning",
+    "age": 69,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "I can see flames on the ridge behind my house right now!",
+      "The road's full of smoke.",
+      "I've got a car but I don't think I can get through.",
+      "It's just me."
+    ],
+    "expect": {
+      "role": "needs_ride",
+      "escalation": "flames",
+      "agentMustSay": "call 911"
+    }
+  },
+  {
+    "id": "p17",
+    "name": "Nadia Farouk",
+    "age": 58,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "My husband just collapsed, he's breathing but he won't wake up.",
+      "Please, I need an ambulance.",
+      "We have a car but I can't carry him."
+    ],
+    "expect": {
+      "role": "needs_ride",
+      "escalation": "medical",
+      "agentMustSay": "call 911"
+    }
+  },
+  {
+    "id": "p18",
+    "name": "Jake Morrow",
+    "age": 41,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 3,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Yeah, we're packing now.",
+      "Three of us, two kids.",
+      "We've got a minivan, there's room.",
+      "We could grab someone on the way down if they're close."
+    ],
+    "neighbor": "the older lady two houses up, she uses a walker",
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p19",
+    "name": "Priya Raman",
+    "age": 36,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Hi, yes, we're leaving in ten minutes.",
+      "Me and my partner.",
+      "We have an SUV with the back seats down, we could fit a folding wheelchair."
+    ],
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p20",
+    "name": "Luis Herrera",
+    "age": 45,
+    "language": "es",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Sí, ya me voy.",
+      "Estoy solo, tengo una camioneta grande.",
+      "Puedo llevar a dos o tres personas.",
+      "Mi vecina, la señora de la casa azul, no tiene carro."
+    ],
+    "neighbor": "la señora de la casa azul, no tiene carro",
+    "expect": {
+      "role": "can_help",
+      "language": "es"
+    }
+  },
+  {
+    "id": "p21",
+    "name": "Hannah Becker",
+    "age": 29,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Yep, heading out.",
+      "Just me and my dog.",
+      "I drive a Subaru, I've got a back seat free."
+    ],
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p22",
+    "name": "Dale Yazzie",
+    "age": 52,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "We're fine to go.",
+      "I'm a retired EMT, my wife's with me.",
+      "Pickup truck, I can lift someone if they need it.",
+      "Mr. Fisk down the road is in a big power chair, I don't know if he's got a ride."
+    ],
+    "neighbor": "Mr. Fisk down the road, big power chair",
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p23",
+    "name": "Monica Sato",
+    "age": 47,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 4,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Yes, we got the alert.",
+      "Four of us and two cats.",
+      "We have two cars, so one is free.",
+      "My son is 19, he can drive one out."
+    ],
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p24",
+    "name": "Rafael Ortiz",
+    "age": 38,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Yeah, I work at the lodge, I'm leaving now.",
+      "Just me.",
+      "I've got the lodge's shuttle van keys, it seats twelve. I'd need someone to tell me where to go."
+    ],
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p25",
+    "name": "Gail Thornton",
+    "age": 70,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "We're already in Sedona, at the high school.",
+      "Both of us and the dog, we're fine."
+    ],
+    "expect": {
+      "role": "left"
+    }
+  },
+  {
+    "id": "p26",
+    "name": "Bernard Coyle",
+    "age": 66,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "I left an hour ago, I'm in Flagstaff.",
+      "House is empty."
+    ],
+    "expect": {
+      "role": "left"
+    }
+  },
+  {
+    "id": "p27",
+    "name": "Ana Lucía Reyes",
+    "age": 33,
+    "language": "es",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 3,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Ya salimos, estamos en Cottonwood.",
+      "Los tres estamos bien."
+    ],
+    "expect": {
+      "role": "left",
+      "language": "es"
+    }
+  },
+  {
+    "id": "p28",
+    "name": "Steve Kaminski",
+    "age": 55,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "This is a rental, I'm the owner. Nobody's staying there this week.",
+      "I'm in Scottsdale."
+    ],
+    "expect": {
+      "role": "left"
+    }
+  },
+  {
+    "id": "p29",
+    "name": "Lyle Prescott",
+    "age": 73,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "I'm staying. I've got a sprinkler on the roof.",
+      "I've been through the Slide Fire.",
+      "I have a truck if it gets bad."
+    ],
+    "expect": {
+      "role": "stay",
+      "agentMustSay": "leave now"
+    }
+  },
+  {
+    "id": "p30",
+    "name": "Norma Jean Tate",
+    "age": 82,
+    "language": "en",
+    "truth": {
+      "canLeave": "unsure",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "I'm fine, honey, don't worry about me.",
+      "Well, my knees aren't great.",
+      "I have a car but my hands shake when I'm nervous.",
+      "Actually, I'd rather someone drove me. Is that silly?"
+    ],
+    "correction": "canLeave yes -> unsure; assistance none -> one_person",
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p31",
+    "name": "Douglas Reed",
+    "age": 68,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Is this a scam? How'd you get my number?",
+      "Fine. I can leave. I have a car.",
+      "I don't need anything from you."
+    ],
+    "expect": {
+      "role": "unknown",
+      "note": "hostile/suspicious caller; agent stays calm, gives the safety line, ends politely"
+    }
+  },
+  {
+    "id": "p32",
+    "name": "Imelda Cruz",
+    "age": 77,
+    "language": "es",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": false
+    },
+    "script": [
+      "¿Qué? No le oigo bien.",
+      "Más fuerte, por favor.",
+      "Vivo sola con mi gato.",
+      "Uso andadera y no manejo."
+    ],
+    "tricky": "hard of hearing",
+    "expect": {
+      "role": "needs_ride",
+      "language": "es"
+    }
+  },
+  {
+    "id": "p33",
+    "name": "Victor Lindqvist",
+    "age": 90,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "walker",
+      "assistance": "two_person_lift",
+      "medical": [
+        "oxygen"
+      ],
+      "pets": true,
+      "hasCar": false
+    },
+    "script": [
+      "Hello, Victor speaking.",
+      "My wife Elsa and me.",
+      "She's on oxygen and she can't stand by herself.",
+      "I use a walker. We'd both need help.",
+      "And our old dog, Pepper. Please don't make us leave her."
+    ],
+    "tricky": "won't leave without dog",
+    "expect": {
+      "role": "needs_ride",
+      "need": {
+        "seats": 2,
+        "crew": 2
+      }
+    }
+  },
+  {
+    "id": "p34",
+    "name": "Chloe Abernathy",
+    "age": 24,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Hi, I'm house-sitting, I don't have a car here.",
+      "Just me.",
+      "Can I walk down to Sedona? How far is it?"
+    ],
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p35",
+    "name": "Arthur Bellamy",
+    "age": 85,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walks",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "Yes, hello.",
+      "I'm alone. My car's here.",
+      "I had a small stroke in March, my right side is weak.",
+      "I'm not supposed to drive.",
+      "Will they be here before the fire? Promise me."
+    ],
+    "tricky": "pushes for a promise",
+    "expect": {
+      "role": "needs_ride",
+      "mustNotSay": [
+        "promise",
+        "before the fire"
+      ]
+    }
+  },
+  {
+    "id": "p36",
+    "name": "Kenji Watanabe",
+    "age": 72,
+    "language": "en",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": false,
+      "hasCar": true
+    },
+    "script": [
+      "We're fine, we're loading the car.",
+      "Two of us.",
+      "Oh, and the man across the street, he's blind, lives alone. I don't know if anyone called him."
+    ],
+    "neighbor": "the man across the street, he's blind, lives alone",
+    "expect": {
+      "role": "can_help"
+    }
+  },
+  {
+    "id": "p37",
+    "name": "Sofía Martínez",
+    "age": 61,
+    "language": "es",
+    "truth": {
+      "canLeave": "yes",
+      "peopleCount": 2,
+      "mobility": "walks",
+      "assistance": "none",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "Hola, sí.",
+      "Mi mamá y yo. Tenemos carro.",
+      "Podemos llevar a alguien más si es cerca."
+    ],
+    "expect": {
+      "role": "can_help",
+      "language": "es"
+    }
+  },
+  {
+    "id": "p38",
+    "name": "Phyllis Grant",
+    "age": 80,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Hello?",
+      "Sorry, what was the question?",
+      "Oh. I live by myself. I don't drive.",
+      "I use a walker, I can get to the door."
+    ],
+    "tricky": "hard of hearing",
+    "expect": {
+      "role": "needs_ride"
+    }
+  },
+  {
+    "id": "p39",
+    "name": "Mateo Salinas",
+    "age": 70,
+    "language": "es",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 2,
+      "mobility": "manual_wheelchair",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": false,
+      "hasCar": false
+    },
+    "script": [
+      "Sí.",
+      "Mi esposa y yo.",
+      "Ella usa silla de ruedas. Yo no puedo manejar, mis ojos.",
+      "Necesitamos ayuda."
+    ],
+    "tricky": "speaks Spanish only",
+    "expect": {
+      "role": "needs_ride",
+      "language": "es",
+      "need": {
+        "wheelchair": 1
+      }
+    }
+  },
+  {
+    "id": "p40",
+    "name": "Edna Pruitt",
+    "age": 87,
+    "language": "en",
+    "truth": {
+      "canLeave": "no",
+      "peopleCount": 1,
+      "mobility": "walker",
+      "assistance": "one_person",
+      "medical": [],
+      "pets": true,
+      "hasCar": true
+    },
+    "script": [
+      "It's just me.",
+      "Well, and my grandson is visiting, he's twelve.",
+      "I have a car but he can't drive, and I can't anymore.",
+      "And the dog."
+    ],
+    "correction": "peopleCount 1 -> 2",
+    "expect": {
+      "role": "needs_ride",
+      "need": {
+        "seats": 2
+      }
+    }
+  }
+]

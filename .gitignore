@@ -1,0 +1,27 @@
+# secrets
+.env
+*.env
+!.env.example
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# node
+node_modules/
+.next/
+*.tsbuildinfo
+
+# data caches
+data/roads.graphml
+data/cache/
+
+.DS_Store
+.vscode/
+.idea/
+
+# eval transcripts (large; the summary is data/eval-results.json)
+evals/results.json

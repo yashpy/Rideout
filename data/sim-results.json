@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "simulated": true,
+  "label": "Simulated: 200 homes, Oak Creek Canyon scenario",
+  "metric": "Share of people who needed a ride picked up before their deadline (10 min before the fire reaches the home). Not lives saved; not a forecast.",
+  "generatedAt": "2026-11-15T02:17:13Z",
+  "gitSha": "a4de1ed",
+  "seedsPerColumn": 50,
+  "runs": 150,
+  "bars": [
+    {
+      "key": "today",
+      "label": "Today (911 queue)",
+      "available": true,
+      "color": "orange",
+      "median": 47.6,
+      "min": 36.6,
+      "max": 52.7,
+      "columns": {
+        "low": {
+          "median": 36.6,
+          "p5": 17.9,
+          "p95": 68.8,
+          "runs": 50
+        },
+        "middle": {
+          "median": 47.6,
+          "p5": 31.6,
+          "p95": 75.0,
+          "runs": 50
+        },
+        "high": {
+          "median": 52.7,
+          "p5": 34.1,
+          "p95": 69.8,
+          "runs": 50
+        }
+      }
+    },
+    {
+      "key": "greedy",
+      "label": "RideOut (greedy dispatch)",
+      "available": true,
+      "color": "blue",
+      "median": 90.9,
+      "min": 86.2,
+      "max": 95.9,
+      "columns": {
+        "low": {
+          "median": 86.2,
+          "p5": 71.4,
+          "p95": 100.0,
+          "runs": 50
+        },
+        "middle": {
+          "median": 90.9,
+          "p5": 79.3,
+          "p95": 100.0,
+          "runs": 50
+        },
+        "high": {
+          "median": 95.9,
+          "p5": 86.8,
+          "p95": 100.0,
+          "runs": 50
+        }
+      }
+    },
+    {
+      "key": "ortools",
+      "label": "RideOut (OR-Tools)",
+      "available": false,
+      "color": "blue",
+      "note": "Not built."
+    }
+  ],
+  "headline": {
+    "rideOutPct": 90.9,
+    "todayPct": 47.6,
+    "rideOutRange": [
+      86.2,
+      95.9
+    ],
+    "todayRange": [
+      36.6,
+      52.7
+    ],
+    "runsPerColumn": 50,
+    "text": "In simulation, 91% of people who needed a ride were picked up before their deadline with RideOut, vs 48% with today's 911 queue (median of 50 runs; range 86\u201396% vs 37\u201353% across low/middle/high settings)."
+  },
+  "sensitivity": {
+    "today55": {
+      "label": "Today, only 55% of riders call 911",
+      "columns": {
+        "low": {
+          "median": 26.5,
+          "p5": 13.8,
+          "p95": 50.0,
+          "runs": 50
+        },
+        "middle": {
+          "median": 33.8,
+          "p5": 22.5,
+          "p95": 47.5,
+          "runs": 50
+        },
+        "high": {
+          "median": 39.3,
+          "p5": 22.9,
+          "p95": 53.1,
+          "runs": 50
+        }
+      }
+    },
+    "todayWithNeighbors": {
+      "label": "Today, 911 also dispatches the neighbor cars",
+      "columns": {
+        "low": {
+          "median": 57.1,
+          "p5": 35.7,
+          "p95": 81.2,
+          "runs": 50
+        },
+        "middle": {
+          "median": 65.6,
+          "p5": 48.5,
+          "p95": 85.0,
+          "runs": 50
+        },
+        "high": {
+          "median": 67.3,
+          "p5": 55.9,
+          "p95": 82.4,
+          "runs": 50
+        }
+      }
+    }
+  },
+  "ridersPerRun": {
+    "low": {
+      "median": 20.0,
+      "p5": 13.0,
+      "p95": 33.0,
+      "runs": 50
+    },
+    "middle": {
+      "median": 32.0,
+      "p5": 19.0,
+      "p95": 44.0,
+      "runs": 50
+    },
+    "high": {
+      "median": 48.0,
+      "p5": 37.0,
+      "p95": 63.0,
+      "runs": 50
+    }
+  },
+  "settings": {
+    "low": {
+      "answerShare": 0.4,
+      "needRideShare": 0.08,
+      "heavyShare": 0.3,
+      "fleet": "low",
+      "board": {
+        "walks": 2,
+        "walker": 4,
+        "wheelchair": 8,
+        "lift": 12,
+        "stretcher": 12
+      },
+      "today911DelayMin": 30,
+      "firstArrivalMin": 45
+    },
+    "middle": {
+      "answerShare": 0.6,
+      "needRideShare": 0.12,
+      "heavyShare": 0.4,
+      "fleet": "middle",
+      "board": {
+        "walks": 3,
+        "walker": 6,
+        "wheelchair": 10,
+        "lift": 15,
+        "stretcher": 15
+      },
+      "today911DelayMin": 60,
+      "firstArrivalMin": 90
+    },
+    "high": {
+      "answerShare": 0.75,
+      "needRideShare": 0.18,
+      "heavyShare": 0.5,
+      "fleet": "high",
+      "board": {
+        "walks": 5,
+        "walker": 8,
+        "wheelchair": 15,
+        "lift": 20,
+        "stretcher": 20
+      },
+      "today911DelayMin": 120,
+      "firstArrivalMin": 180
+    }
+  },
+  "fleets": {
+    "low": 4,
+    "middle": 8,
+    "high": 12
+  },
+  "assumptions": {
+    "source": "docs/simulation.md (settings columns); the rest below are modeling assumptions",
+    "homes": 200,
+    "callsPerMin": 60.0,
+    "answeredCallMin": 2.5,
+    "unansweredRingMin": 0.5,
+    "reachLadderGapsMin": [
+      2.0,
+      5.0
+    ],
+    "textReplyMin": 5.0,
+    "doorCheckMin": 30.0,
+    "dispatchApproveAcceptMin": 2.0,
+    "unloadMin": 5.0,
+    "today911CallWindowMin": 30.0,
+    "todayCallShare": 1.0,
+    "today911FleetExcludesNeighbors": true,
+    "secondPersonShare": 0.35,
+    "twoPersonLiftShareOfHeavy": 0.5,
+    "walkerShareOfOther": 0.4,
+    "bothStartAtTheOrder": true,
+    "roadModel": "SR 89A as one polyline (api/sim/geo.py), 35 km/h + side streets at 15 km/h",
+    "fireModel": "elliptical spread from the scenario ignition + wind (api/sim/seed.py), scenario input"
+  },
+  "notClaimed": [
+    "lives saved",
+    "that the fire model is a forecast",
+    "numbers not in this file or on /system"
+  ]
+}

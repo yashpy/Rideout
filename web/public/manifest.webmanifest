@@ -1,0 +1,8 @@
+{
+  "name": "RideOut Driver",
+  "short_name": "RideOut",
+  "start_url": "/driver",
+  "display": "standalone",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13"
+}

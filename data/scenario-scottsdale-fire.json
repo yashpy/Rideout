@@ -1,0 +1,259 @@
+{
+  "name": "scottsdale-fire",
+  "title": "McDowell Fire, North Scottsdale (SIMULATED scenario)",
+  "simulated": true,
+  "timezone": "America/Phoenix",
+  "network": "grid",
+  "note": "A simulated wind-driven fire that starts in the McDowell Mountains (McDowell Sonoran Preserve) and is pushed west by an east wind into North Scottsdale. The 9 zones are a simulated grid over one continuous area between Scottsdale Rd and the mountains; zone names point to the nearest neighborhood and are APPROXIMATE, not official evacuation zones. Every home and person is simulated. Ignition, wind and spread rate are our assumptions.",
+  "ignition": [
+    -111.795,
+    33.668
+  ],
+  "wind": {
+    "speedMps": 11.2,
+    "gustMps": 20.1,
+    "fromDeg": 90,
+    "note": "ASSUMPTION: a 25 mph east wind pushing the fire out of the mountains toward the neighborhoods."
+  },
+  "area": [
+    [
+      -111.915,
+      33.625
+    ],
+    [
+      -111.825,
+      33.705
+    ]
+  ],
+  "mountainEdge": {
+    "note": "homes stop at a ragged line just west of the preserve",
+    "lonAtSouth": -111.828,
+    "lonAtNorth": -111.842
+  },
+  "bounds": [
+    [
+      -111.985,
+      33.545
+    ],
+    [
+      -111.77,
+      33.725
+    ]
+  ],
+  "defaultHomes": 6000,
+  "zones": [
+    {
+      "id": "zone_sc_1",
+      "name": "Zone 1 \u00b7 Scottsdale Airpark",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.915,
+          33.625
+        ],
+        [
+          -111.885,
+          33.65167
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_2",
+      "name": "Zone 2 \u00b7 Horseman's Park",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.885,
+          33.625
+        ],
+        [
+          -111.855,
+          33.65167
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_3",
+      "name": "Zone 3 \u00b7 McDowell Mountain Ranch",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.855,
+          33.625
+        ],
+        [
+          -111.825,
+          33.65167
+        ]
+      ],
+      "weight": 0.85
+    },
+    {
+      "id": "zone_sc_4",
+      "name": "Zone 4 \u00b7 Grayhawk South",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.915,
+          33.65167
+        ],
+        [
+          -111.885,
+          33.67833
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_5",
+      "name": "Zone 5 \u00b7 DC Ranch West",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.885,
+          33.65167
+        ],
+        [
+          -111.855,
+          33.67833
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_6",
+      "name": "Zone 6 \u00b7 DC Ranch",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.855,
+          33.65167
+        ],
+        [
+          -111.825,
+          33.67833
+        ]
+      ],
+      "weight": 0.85
+    },
+    {
+      "id": "zone_sc_7",
+      "name": "Zone 7 \u00b7 Grayhawk North",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.915,
+          33.67833
+        ],
+        [
+          -111.885,
+          33.705
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_8",
+      "name": "Zone 8 \u00b7 Pinnacle Peak",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.885,
+          33.67833
+        ],
+        [
+          -111.855,
+          33.705
+        ]
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "zone_sc_9",
+      "name": "Zone 9 \u00b7 Silverleaf",
+      "county": "Maricopa",
+      "box": [
+        [
+          -111.855,
+          33.67833
+        ],
+        [
+          -111.825,
+          33.705
+        ]
+      ],
+      "weight": 0.85
+    }
+  ],
+  "shelters": [
+    {
+      "_id": "sh_sc_westgate",
+      "name": "West edge medical shelter (simulated)",
+      "location": [
+        -111.928,
+        33.668
+      ],
+      "capacity": 600
+    },
+    {
+      "_id": "sh_sc_southgate",
+      "name": "South edge medical shelter (simulated)",
+      "location": [
+        -111.868,
+        33.612
+      ],
+      "capacity": 400
+    },
+    {
+      "_id": "sh_sc_kierland",
+      "name": "Kierland shelter (simulated)",
+      "location": [
+        -111.926,
+        33.585
+      ],
+      "capacity": 500
+    },
+    {
+      "_id": "sh_sc_south",
+      "name": "South Scottsdale shelter (simulated)",
+      "location": [
+        -111.925,
+        33.552
+      ],
+      "capacity": 400
+    },
+    {
+      "_id": "sh_sc_west",
+      "name": "North Phoenix shelter (simulated)",
+      "location": [
+        -111.975,
+        33.64
+      ],
+      "capacity": 400
+    }
+  ],
+  "staging": {
+    "airpark": [
+      -111.912,
+      33.622
+    ],
+    "shea_scottsdale": [
+      -111.926,
+      33.59
+    ],
+    "pima_bell": [
+      -111.892,
+      33.64
+    ],
+    "thompson_peak": [
+      -111.9,
+      33.676
+    ],
+    "hayden_shea": [
+      -111.909,
+      33.582
+    ]
+  }
+}

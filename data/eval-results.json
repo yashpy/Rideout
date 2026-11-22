@@ -1,0 +1,142 @@
+{
+  "generatedAt": "2026-11-15T03:04:09+00:00",
+  "interpreterConfigured": "rules",
+  "simulated": true,
+  "note": "Fictional personas (data/personas.json) run through the real agent code, in-process.",
+  "judge": null,
+  "runSeconds": 0.4,
+  "modes": {
+    "script": {
+      "summary": {
+        "personas": 40,
+        "callsCompleted": 40,
+        "fieldAccuracy": {
+          "assistance": 0.0,
+          "canLeave": 0.5,
+          "hasCar": 0.0,
+          "medical": 0.24,
+          "mobility": 0.28,
+          "peopleCount": 0.325,
+          "pets": 0.225
+        },
+        "fieldCounts": {
+          "canLeave": {
+            "correct": 20,
+            "total": 40
+          },
+          "peopleCount": {
+            "correct": 13,
+            "total": 40
+          },
+          "pets": {
+            "correct": 9,
+            "total": 40
+          },
+          "mobility": {
+            "correct": 7,
+            "total": 25
+          },
+          "medical": {
+            "correct": 6,
+            "total": 25
+          },
+          "assistance": {
+            "correct": 0,
+            "total": 15
+          },
+          "hasCar": {
+            "correct": 0,
+            "total": 16
+          }
+        },
+        "overallFieldAccuracy": 0.274,
+        "roleAccuracy": 0.625,
+        "needAccuracy": 0.571,
+        "correctionsCaught": "0/2",
+        "honesty": {
+          "turnsJudged": 620,
+          "turnsPassed": 620,
+          "failures": 0
+        },
+        "acks": {
+          "proposed": 0,
+          "blocked": 0
+        },
+        "latencyMs": {
+          "p50": 0.2,
+          "p95": 0.5,
+          "turns": 580
+        },
+        "interpreters": [
+          "rules"
+        ]
+      }
+    },
+    "answers": {
+      "summary": {
+        "personas": 40,
+        "callsCompleted": 40,
+        "fieldAccuracy": {
+          "assistance": 1.0,
+          "canLeave": 1.0,
+          "hasCar": 1.0,
+          "medical": 1.0,
+          "mobility": 1.0,
+          "peopleCount": 1.0,
+          "pets": 1.0
+        },
+        "fieldCounts": {
+          "canLeave": {
+            "correct": 40,
+            "total": 40
+          },
+          "peopleCount": {
+            "correct": 40,
+            "total": 40
+          },
+          "pets": {
+            "correct": 40,
+            "total": 40
+          },
+          "mobility": {
+            "correct": 25,
+            "total": 25
+          },
+          "medical": {
+            "correct": 25,
+            "total": 25
+          },
+          "assistance": {
+            "correct": 15,
+            "total": 15
+          },
+          "hasCar": {
+            "correct": 16,
+            "total": 16
+          }
+        },
+        "overallFieldAccuracy": 1.0,
+        "roleAccuracy": 0.975,
+        "needAccuracy": 1.0,
+        "correctionsCaught": "2/2",
+        "honesty": {
+          "turnsJudged": 388,
+          "turnsPassed": 388,
+          "failures": 0
+        },
+        "acks": {
+          "proposed": 0,
+          "blocked": 0
+        },
+        "latencyMs": {
+          "p50": 0.2,
+          "p95": 0.4,
+          "turns": 348
+        },
+        "interpreters": [
+          "rules"
+        ]
+      }
+    }
+  }
+}

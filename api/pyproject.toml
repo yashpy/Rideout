@@ -1,0 +1,47 @@
+[project]
+name = "rideout-api"
+version = "0.0.1"
+description = "RideOut API: agent turns, core ride rules, dispatch, hazard, live events"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.30",
+    "fastapi>=0.163.0",
+    "httpx>=0.28.1",
+    "motor>=3.7.1",
+    "pydantic>=2.14.3",
+    "pydantic-settings>=2.16.3",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "mongomock-motor>=0.0.36",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "ruff>=0.17.5",
+]
+
+# The importable package is `api` (this folder), so code imports `api.requests`,
+# never a bare `requests` (which would shadow the HTTP library used by Google SDKs).
+# Run the server from the repo root:  uv run --project api uvicorn api.main:app --reload
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = [".."]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib -q"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC"]
+ignore = ["B008"]  # FastAPI Depends() in defaults
+
+[tool.ruff.lint.isort]
+known-first-party = ["api"]
