@@ -31,6 +31,7 @@ class Need:
     stretcher: int = 0
     crew: int = 1
     lift: bool = False
+    olderAdult: bool = False  # 65+ (see head_start_min)
     board_kind: str | None = None  # override the boarding class (the simulation knows walker vs walks)
 
     @classmethod
@@ -42,6 +43,7 @@ class Need:
             stretcher=int(d.get("stretcher") or 0),
             crew=int(d.get("crew") or 1),
             lift=bool(d.get("lift")),
+            olderAdult=bool(d.get("olderAdult")),
         )
 
     def kind(self) -> str:
@@ -60,15 +62,22 @@ class Need:
     def weight(self) -> float:
         """Need-weighted waiting: heavier needs count more. People who can't walk out are who this system is
         for: few vehicles can carry them and boarding takes 10-15 min, so each minute they wait costs more."""
-        return 1.0 + 2 * self.wheelchair + 4 * self.stretcher + (1.0 if self.lift else 0)
+        return (
+            1.0 + 2 * self.wheelchair + 4 * self.stretcher + (1.0 if self.lift else 0) + (0.5 if self.olderAdult else 0)
+        )
 
     def mobility(self) -> bool:
         """Can't walk to a car: wheelchair, lift or stretcher."""
         return bool(self.wheelchair or self.stretcher or self.lift)
 
     def head_start_min(self) -> float:
-        """Planned this many minutes earlier than their deadline alone says (see priority_key)."""
-        return 45.0 if self.stretcher else 30.0 if (self.wheelchair or self.lift) else 0.0
+        """Planned this many minutes earlier than their deadline alone says (see priority_key). Older adults
+        (65+) who can walk still get a smaller head start: they board slower and are most at risk from smoke."""
+        if self.stretcher:
+            return 45.0
+        if self.wheelchair or self.lift:
+            return 30.0
+        return 15.0 if self.olderAdult else 0.0
 
 
 def priority_key(r: "Rider") -> tuple:

@@ -27,6 +27,7 @@ DB name = `rideout_${ENV}` (`dev`, `staging`, `prod`). All geometry is GeoJSON. 
     "medical": ["oxygen"],        // oxygen | dialysis | other
     "pets": true,
     "hasCar": false,
+    "olderAdult": true,           // additive: someone at home is 65+ (only when said on the call)
     "confidence": { "mobility": 0.9 }
   },
   "corrections": [ { "field": "peopleCount", "from": 1, "to": 2, "at": "..." } ],
@@ -46,7 +47,7 @@ DB name = `rideout_${ENV}` (`dev`, `staging`, `prod`). All geometry is GeoJSON. 
 {
   "_id": "rq_...", "householdId": "hh_...",
   "status": "received|approved|driver_accepted|en_route|arrived|closed|reassigning",
-  "need": { "seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": true },
+  "need": { "seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": true, "olderAdult": false },  // olderAdult: additive, 15-min planning head start
   "deadlineAt": "ISO", "priority": 0.0,
   "escalation": null,            // medical | flames | address_unconfirmed | unservable | language
   "dupOf": null,                 // set by dedupe
