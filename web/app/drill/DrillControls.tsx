@@ -89,16 +89,16 @@ export function DrillControls({ zoneId, initial }: { zoneId: string; initial: Dr
           ))}
         </div>
         <p className="text-xs text-muted">
-          Publishing only changes this page. RideOut acts when TinyFish reads the page.
+          Publishing only changes this page. RideOut acts when the zone watcher reads the page.
         </p>
       </section>
 
       <section className="flex flex-col gap-3 rounded border border-line p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="font-semibold">TinyFish watcher</h2>
+            <h2 className="font-semibold">Zone watcher</h2>
             <p className="text-xs text-muted">
-              Reads this page with TinyFish Fetch while armed (free tier, stops by itself).
+              Reads this page while armed (stops by itself).
             </p>
           </div>
           <button
@@ -130,10 +130,10 @@ export function DrillControls({ zoneId, initial }: { zoneId: string; initial: Dr
             {zoneStatus === "set" || zoneStatus === "go" ? " · calling every home" : ""}
           </dd>
         </dl>
-        {!view.tinyfishConfigured && <p className="text-sm text-help">TINYFISH_API_KEY is not set on the API.</p>}
+        {!view.tinyfishConfigured && <p className="text-sm text-help">The zone watcher is not configured on the API.</p>}
         {watch.lastError && <p className="text-sm text-help">{watch.lastError}</p>}
         <p className="truncate text-xs text-muted" title={view.drillUrl}>
-          TinyFish reads: {view.drillUrl}
+          Zone watcher reads: {view.drillUrl}
         </p>
       </section>
 
