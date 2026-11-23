@@ -74,10 +74,7 @@ const SCREENS = [
 const TECH = [
   ["MongoDB Atlas", "one database; change streams drive every live screen"],
   ["ElevenLabs", "voice: listening and speaking on real phone calls"],
-  ["Google Gemini", "optional: reads free speech into the record (keyword reader without a key)"],
   ["Anthropic Claude", "optional fallback interpreter and honesty judge"],
-  ["TinyFish", "optional: watches county evacuation pages for SET and GO"],
-  ["Tiger Data", "optional: fire detections in TimescaleDB (in memory without it)"],
   ["Render", "the API and the voice relay (free tier)"],
   ["Lovable.dev", "early UI prototype"],
   ["Vercel", "the web app, one deploy per branch"],
