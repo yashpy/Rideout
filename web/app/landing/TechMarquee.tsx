@@ -9,7 +9,7 @@ const TECH = [
   "Google Gemini",
   "TinyFish",
   "Tiger Data",
-  "Vultr",
+  "Render",
   "Vercel",
   "Next.js",
   "FastAPI",
