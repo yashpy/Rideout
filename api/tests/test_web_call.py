@@ -52,3 +52,39 @@ async def test_web_call_skips_homes_with_a_driver_on_the_way(client, db):
     await db.requests.update_one({"_id": req["_id"]}, {"$set": {"status": "driver_accepted"}})
     r = await client.post("/calls/web", json={})
     assert r.status_code == 200 and r.json()["householdId"] == free["_id"]
+
+
+async def test_a_tapped_house_with_a_driver_falls_back_to_the_nearest_free_one(client, db):
+    from api import requests as rq
+
+    tapped = await make_household(db, simulated=True)
+    near = await make_household(db, simulated=True)
+    for h in (tapped, near):
+        await db.households.update_one({"_id": h["_id"]}, {"$set": {"reach": "answered"}})
+    req = await rq.upsert_for_household(db, tapped["_id"], need={"seats": 1})
+    await db.requests.update_one({"_id": req["_id"]}, {"$set": {"status": "en_route"}})
+    r = await client.post("/calls/web", json={"householdId": tapped["_id"]})
+    assert r.status_code == 200 and r.json()["householdId"] == near["_id"]
+    # the tapped house's ride is untouched
+    assert (await db.requests.find_one({"_id": req["_id"]}))["status"] == "en_route"
+
+
+async def test_kiosk_uses_the_nearest_free_house_too(client, db, monkeypatch):
+    from api import requests as rq
+    from api.agent import dialer
+    from api.core.config import get_settings
+
+    s = get_settings()
+    for k in ("elevenlabs_api_key", "elevenlabs_agent_id", "elevenlabs_phone_number_id"):
+        monkeypatch.setattr(s, k, "x")
+
+    async def fake(hh, call_id, call_type="outbound"):
+        return "conv_1"
+
+    monkeypatch.setattr(dialer, "_elevenlabs_call", fake)
+    tapped = await make_household(db, simulated=True)
+    near = await make_household(db, simulated=True)
+    req = await rq.upsert_for_household(db, tapped["_id"], need={"seats": 1})
+    await db.requests.update_one({"_id": req["_id"]}, {"$set": {"status": "driver_accepted"}})
+    r = await client.post("/calls/kiosk", json={"householdId": tapped["_id"], "phone": "+14805551234"})
+    assert r.status_code == 200 and r.json()["householdId"] == near["_id"]

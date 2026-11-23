@@ -200,6 +200,7 @@ export default function Kiosk() {
     setError(null);
     try {
       const res = await api.kiosk(selected, e164, myPlace);
+      setSelected(res.householdId); // a busy house is swapped for the nearest free one
       setInBrowser(false);
       setCallId(res.callId);
     } catch (e) {
@@ -218,6 +219,7 @@ export default function Kiosk() {
     if (!selected) return;
     try {
       const res = await api.webCall("en", selected);
+      setSelected(res.householdId);
       setInBrowser(true);
       setCallId(res.callId);
     } catch (e) {
