@@ -14,7 +14,6 @@ from fastapi.responses import JSONResponse
 from api import live, workers
 from api.core import db as dbmod
 from api.core.config import VERSION, get_settings
-
 # from api.hazard import tiger
 from api.routes import (
     agent,
