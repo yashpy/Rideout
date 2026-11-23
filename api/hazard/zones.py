@@ -4,8 +4,8 @@
 Both moments come from the same elliptical spread model the map draws and the homes' deadlines use
 (api/sim/seed.fire_minutes), so the zone changes exactly when the drawn fire gets there.
 
-Status only moves forward, so the fire never undoes a SET/GO from TinyFish or a dispatcher, and never
-touches a zone marked CLEAR. Changes go through zonewatch.set_zone_status (audit log, dialer) with
+Status only moves forward, so the fire never undoes a SET/GO from the county or a dispatcher, and never
+touches a zone marked CLEAR. Changes go through zone_status.set_zone_status (audit log, dialer) with
 `source: "fire"`. Simulated zones only; off with simControl `standIns.fireZones = false`.
 """
 
@@ -17,7 +17,7 @@ from typing import Any
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from api.agent import zonewatch
+from api.agent import zone_status
 from api.core.util import utcnow
 from api.dispatch.loop import sim_control
 from api.hazard import spread
@@ -137,7 +137,7 @@ async def tick(db: AsyncIOMotorDatabase, now: datetime | None = None) -> list[tu
         current = zone.get("status", "ready")
         if current not in RANK or RANK[z["level"]] <= RANK[current]:
             continue  # forward only; CLEAR is left alone
-        await zonewatch.set_zone_status(db, z["zoneId"], z["level"], source="fire", source_url=None)
+        await zone_status.set_zone_status(db, z["zoneId"], z["level"], source="fire", source_url=None)
         changes.append((z["zoneId"], z["level"]))
         log.info("fire moved %s %s → %s", z["zoneId"], current, z["level"])
     return changes

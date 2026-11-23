@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from api.core.db import get_db
 from api.core.util import utcnow
 from api.dispatch.loop import request_replan, sim_control, solve_once, world_lock
-from api.hazard import fire
 from api.sim import seed as sim_seed
 from api.sim.geo import ROAD_KMH
 
@@ -20,19 +19,6 @@ _background: set[asyncio.Task] = set()
 def _stop_census() -> None:
     for t in [t for t in _background if t.get_name() == "census-waves"]:
         t.cancel()
-
-
-def _publish_fire_run(db) -> None:
-    """Write the new fire run's detections to Tiger Data without making the seed wait."""
-
-    async def go() -> None:
-        doc = await db.hazards.find_one({"_id": fire.RUN_ID})
-        if doc:
-            await fire.publish(db, fire.run_from_doc(doc))
-
-    task = asyncio.create_task(go())
-    _background.add(task)
-    task.add_done_callback(_background.discard)
 
 
 @router.post("/seed")
@@ -56,7 +42,6 @@ async def seed(
             get_db(), scenario=scenario, homes=homes, rng_seed=seed, census=census, first_arrival_min=firstArrivalMin
         )
     request_replan()
-    _publish_fire_run(get_db())
     return result
 
 
@@ -196,7 +181,6 @@ async def drive_test(
         world = await sim_seed.seed(
             db, scenario=scenario or sim_world.active(), homes=homes, rng_seed=seed, census="instant"
         )
-    _publish_fire_run(db)
     await db.simControl.update_one(
         {"_id": "sim"},
         {

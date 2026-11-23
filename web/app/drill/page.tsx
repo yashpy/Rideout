@@ -5,8 +5,7 @@ import { DrillControls, type DrillView } from "./DrillControls";
 
 /**
  * RideOut drill page. Plainly labeled; it must never look like a real county site.
- * The "Zone status" line is rendered on the server so TinyFish Fetch reads it as plain text,
- * exactly the way it would read a county Ready/Set/Go page.
+ * Publishing a status here sets the zone to it, so SET or GO starts the calls.
  */
 export const dynamic = "force-dynamic";
 
@@ -72,14 +71,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ z
         <section className="flex flex-col gap-1">
           <p className="text-sm text-muted">RideOut evacuation drill</p>
           <h1 className="text-2xl font-semibold">{view?.name ?? zone}</h1>
-          {/* TinyFish parses this exact line. Keep the words "Zone status:" and the status word together. */}
           <p className="mt-3 text-3xl">
             Zone status:{" "}
             <strong className={published === "READY" || published === "CLEAR" ? "" : "text-help"}>{published}</strong>
           </p>
           <p className="text-sm text-muted">
-            Ready means be ready. Set means get set to leave. Go means leave now. This page only publishes a drill
-            status.
+            Ready means be ready. Set means get set to leave. Go means leave now. Publishing a drill status sets the
+            zone to it.
           </p>
         </section>
 

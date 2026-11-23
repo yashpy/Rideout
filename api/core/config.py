@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     mongodb_uri: str = "mongodb://localhost:27017"
     # Optional: keep the password out of MONGODB_URI. Put `<db_password>` in the URI and the password here.
     mongodb_password: str = ""
-    tiger_database_url: str = ""
 
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"
@@ -38,7 +37,6 @@ class Settings(BaseSettings):
     elevenlabs_phone_number_id: str = ""
     elevenlabs_telephony: Literal["twilio", "sip-trunk"] = "twilio"  # how the number was imported
     firms_map_key: str = ""
-    tinyfish_api_key: str = ""
 
     # Dialer. Real calls are paced at 1/s per number (Twilio default); stand-ins have no such limit.
     dial_rate_per_s: float = 1.0
@@ -47,12 +45,6 @@ class Settings(BaseSettings):
     standin_turn_delay_s: float = 0.6  # pause between stand-in turns, so /calls looks like a call
     standin_use_models: bool = False  # stand-ins use the free rule interpreter; real calls use Gemini/Claude
     reach_ladder_scale: float = 1.0  # 0.1 = retries after 12 s / 30 s instead of 2 / 5 min (demo)
-    # TinyFish zone watcher. Fetch only: free up to 1,000 URLs/day; the cap keeps us under it.
-    public_web_url: str = "http://localhost:3000"  # where TinyFish finds /drill (must be public)
-    tinyfish_daily_cap: int = 800
-    tinyfish_poll_s: float = 15.0
-    tinyfish_arm_minutes: float = 30.0
-    county_page_url: str = ""  # optional one-time read-only fetch for the pitch
     public_api_url: str = "http://localhost:8000"
     internal_token: str = "dev-token-change-me"
     cors_origins: str = "*"  # comma-separated

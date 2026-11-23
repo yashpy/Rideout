@@ -143,7 +143,6 @@ async def position(vehicle_id: str, body: PositionBody) -> dict:
     """A phone's GPS fix. Fixes far from the scenario's road (a demo phone in Tempe driving "Luis" in Oak
     Creek Canyon) are not applied: they would drag the van 150 km away and the planner would give its
     pickups to someone else. The phone still owns the vehicle (phoneSeenAt)."""
-    # TODO: also append to Tiger Data `vehicle_positions`.
     if world.network().off_area_m((body.lon, body.lat)) > MAX_GPS_OFF_ROAD_M:
         res = await get_db().vehicles.update_one({"_id": vehicle_id}, {"$set": {"phoneSeenAt": utcnow()}})
         if not res.matched_count:

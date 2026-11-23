@@ -1,8 +1,8 @@
-"""Fire replay: one run per seed, stored in Tiger Data, read "as of" any time for the map.
+"""Fire replay: one run per seed, read "as of" any time for the map.
 
-The seed records the run (ignition, wind, ignition time) in `hazards` as `_id: "fire_run"`; `publish()`
-writes its detections to Tiger. `view()` answers GET /hazards/fire?at=…: burned area, the active edge,
-15-minute activity, and how many homes the front has reached by then.
+The seed records the run (ignition, wind, ignition time) in `hazards` as `_id: "fire_run"`. Detections are
+computed in memory from that run (deterministic per run). `view()` answers GET /hazards/fire?at=…: burned
+area, the active edge, 15-minute activity, and how many homes the front has reached by then.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -11,7 +11,7 @@ from typing import Any
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from api.hazard import spread, tiger
+from api.hazard import spread
 from api.hazard.spread import Detection, FireRun
 
 RUN_ID = "fire_run"  # the hazards document holding the current run
@@ -34,7 +34,6 @@ def run_doc(run: FireRun) -> dict[str, Any]:
         "windFromDeg": run.wind_from_deg,
         "ignitedAt": run.ignited_at,
         "replayHours": spread.REPLAY_HOURS,
-        "store": "pending",  # → "tiger" once written, "model" if Tiger isn't configured or reachable
         "simulated": True,
     }
 
@@ -55,18 +54,6 @@ def _detections(run: FireRun) -> tuple[Detection, ...]:
     return tuple(spread.detections(run))
 
 
-async def publish(db: AsyncIOMotorDatabase, run: FireRun) -> str:
-    """Write the run's detections to Tiger Data. Runs in the background after a seed."""
-    rows = list(_detections(run))
-    stored = await tiger.write_run(run.run_id, rows)
-    store = "tiger" if stored else "model"
-    # Only if this run is still current (a newer seed may have replaced it meanwhile).
-    await db.hazards.update_one(
-        {"_id": RUN_ID, "runId": run.run_id}, {"$set": {"store": store, "detections": len(rows)}}
-    )
-    return store
-
-
 def _bucket(dt: datetime) -> datetime:
     return datetime.fromtimestamp(int(dt.timestamp()) // BUCKET_S * BUCKET_S, tz=UTC)
 
@@ -78,18 +65,12 @@ async def view(db: AsyncIOMotorDatabase, at: datetime) -> dict[str, Any]:
     run = run_from_doc(doc)
     at = _utc(at)
 
-    data = await tiger.read_until(run.run_id, at) if doc.get("store") == "tiger" else None
-    if data is not None:
-        source = "tiger"
-        dets = [(_utc(t), lon, lat, frp) for t, lon, lat, frp in data["detections"]]
-        activity = data["activity"]
-    else:
-        source = "model"
-        dets = [(d.time, d.lon, d.lat, d.frp) for d in _detections(run) if d.time <= at]
-        acc: dict[datetime, list[float]] = {}
-        for t, _, _, frp in dets:
-            acc.setdefault(_bucket(t), []).append(frp)
-        activity = [{"at": b, "hotspots": len(v), "frp": round(sum(v), 1)} for b, v in sorted(acc.items())]
+    source = "model"
+    dets = [(d.time, d.lon, d.lat, d.frp) for d in _detections(run) if d.time <= at]
+    acc: dict[datetime, list[float]] = {}
+    for t, _, _, frp in dets:
+        acc.setdefault(_bucket(t), []).append(frp)
+    activity = [{"at": b, "hotspots": len(v), "frp": round(sum(v), 1)} for b, v in sorted(acc.items())]
 
     burned = spread.hull([run.ignition, *((lon, lat) for _, lon, lat, _ in dets)]) if dets else []
     active_since = at - timedelta(minutes=ACTIVE_MIN)

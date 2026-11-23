@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Fire replay bar: scrub or play the simulated fire. Each position asks GET /hazards/fire?at=…, which reads
- * the detections from Tiger Data (a TimescaleDB hypertable) when the API has TIGER_DATABASE_URL.
+ * Fire replay bar: scrub or play the simulated fire. Each position asks GET /hazards/fire?at=…, which computes
+ * the detections from the spread model.
  *
  * Collapsed by default to one line (heading, play, time, Live); click the heading or the chevron for the
  * slider, numbers and zone chips.
@@ -206,16 +206,10 @@ export function FireReplay({
         <span className="text-muted">· {fire.label}</span>
         <span className="ml-auto flex items-center gap-2">
           <span
-            title={
-              fire.source === "tiger"
-                ? "Detections read from the external fire data store"
-                : "External fire data unavailable: same model computed in memory"
-            }
-            className={`rounded-full border px-1.5 py-px text-[10px] font-semibold tracking-[0.06em] ${
-              fire.source === "tiger" ? "border-accent/50 text-accent" : "border-line text-muted"
-            }`}
+            title="Detections computed from the spread model"
+            className="rounded-full border border-line px-1.5 py-px text-[10px] font-semibold tracking-[0.06em] text-muted"
           >
-            {fire.source === "tiger" ? "EXTERNAL DATA" : "MODEL"}
+            MODEL
           </span>
           <button
             className={`btn min-h-7 px-2 text-[11px] ${at === null ? "border-fire/50 text-fire" : ""}`}

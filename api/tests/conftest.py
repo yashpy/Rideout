@@ -14,9 +14,7 @@ for _k in (
     "GEMINI_API_KEY",
     "ANTHROPIC_API_KEY",
     "ELEVENLABS_API_KEY",
-    "TINYFISH_API_KEY",
     "FIRMS_MAP_KEY",
-    "TIGER_DATABASE_URL",  # test_fire.py opts in with TIGER_TEST_URL
 ):
     os.environ[_k] = ""
 

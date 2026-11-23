@@ -6,8 +6,6 @@
 - dispatch: data/sim-results.json from the impact simulation (api/sim/compare.py), when it exists.
 - census:   households by reach, open requests by status, duplicates.
 - audit:    the last 40 audit-log entries.
-
-TODO(Tiger Data): read latency from the `call_turns` hypertable once TIGER_DATABASE_URL is set.
 """
 
 import json

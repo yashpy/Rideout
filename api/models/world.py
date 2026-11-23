@@ -41,7 +41,7 @@ class Zone(Doc):
     county: str
     status: Literal["ready", "set", "go", "clear"] = "ready"
     polygon: Polygon | None = None
-    source: Literal["tinyfish", "manual"] = "manual"
+    source: Literal["county", "manual", "fire"] = "manual"
     sourceUrl: str | None = None
     updatedAt: ISO | None = None
 

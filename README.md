@@ -117,10 +117,9 @@ The database schema, status machine, API and event types are in [`docs/CONTRACT.
 | Interpretation | Gemini Flash (JSON schema output), Claude as fallback (Anthropic API or Amazon Bedrock) |
 | API | Python 3.12, FastAPI, Motor — `api/` |
 | Database | MongoDB Atlas: geo queries, Vector Search (duplicate calls), change streams (`/live`) |
-| Zone watcher | TinyFish fetch of county Ready / Set / Go pages |
 | Web | Next.js 15, Tailwind 4, Zustand, MapLibre GL + react-map-gl + deck.gl, OpenFreeMap tiles (light/dark) — `web/` |
-| Hosting | API: Docker on a Vultr VM behind Caddy (dev / staging / prod containers). Web: Vercel |
-| CI/CD | GitHub Actions: lint + tests on every PR; image to GHCR and SSH deploy per branch |
+| Hosting | API and voice relay: Render (free, `render.yaml`). Web: Vercel |
+| CI/CD | GitHub Actions: lint + tests on every PR |
 
 ## Screens
 
@@ -132,7 +131,7 @@ The database schema, status machine, API and event types are in [`docs/CONTRACT.
 | `/driver` | Drivers (phone, PWA) | Offer cards → Accept/Decline → every rider + seats left → "Picked up". Addresses open in the map app. SOS (hold), man-down |
 | `/driver/fleet` | Dispatcher / demo | Every driver's screen on one page, with their notifications as they happen |
 | `/system` | Anyone | Under the hood: latency, honesty rate, dispatch vs. baseline (simulated), audit trail |
-| `/drill` | Testing | A clearly labeled RideOut drill page with a test zone's Ready / Set / Go status, read by the zone watcher. Never styled as a county site |
+| `/drill` | Testing | A clearly labeled RideOut drill page that sets a test zone's Ready / Set / Go status. Never styled as a county site |
 | `/report` | Anyone | Photo hazard reports (not built yet) |
 
 The UI follows the system theme (light or dark) and has a manual toggle. Anything simulated carries a "simulated" label.
@@ -173,7 +172,7 @@ rideout/
 │  └─ sources.md           ← primary sources for the scenario and population data
 ├─ api/                    ← FastAPI (Python 3.12)
 │  ├─ main.py  core/  models/  requests.py  assignments.py  callbacks.py  routes/
-│  ├─ agent/    (turn state machine, interpreter, templates, honesty guard, dedupe, dialer, zone watcher)
+│  ├─ agent/    (turn state machine, interpreter, templates, honesty guard, dedupe, dialer, zone status)
 │  ├─ dispatch/ (greedy solver, solve loop)
 │  ├─ sim/      (simulated households, drivers, road model, impact comparison)
 │  └─ tests/
@@ -181,8 +180,8 @@ rideout/
 ├─ web/                    ← Next.js app (kiosk, console, calls, driver, system, drill)
 ├─ evals/                  ← persona runs, honesty + accuracy results
 ├─ data/                   ← scenario.json, personas.json, population.md, sim-results.json, eval-results.json
-├─ infra/                  ← docker-compose, Caddyfile, VM bootstrap and deploy scripts
-└─ .github/workflows/      ← ci.yml, deploy.yml
+├─ infra/                  ← local MongoDB compose file, Render Dockerfile
+└─ .github/workflows/      ← ci.yml
 ```
 
 ## Run it locally
@@ -216,7 +215,6 @@ All configuration comes from environment variables; see [`.env.example`](.env.ex
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | Interpreter |
 | `CLAUDE_PROVIDER`, `ANTHROPIC_API_KEY` or `AWS_*` | Claude fallback (Anthropic API or Bedrock) |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID`, `ELEVENLABS_PHONE_NUMBER_ID`, `ELEVENLABS_TELEPHONY` | Outbound calls |
-| `TINYFISH_API_KEY`, `COUNTY_PAGE_URL`, `PUBLIC_WEB_URL` | Zone watcher |
 | `INTERNAL_TOKEN` | Shared secret between the voice agent and the API |
 | `NEXT_PUBLIC_API_URL` | Web → API base URL |
 | `CORS_ORIGINS` | Allowed web origins |

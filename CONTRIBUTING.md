@@ -33,8 +33,7 @@ changed, and how it was tested.
 ## CI/CD (`.github/workflows/`)
 
 - `ci.yml` (every PR): `api`: ruff + pytest. `web`: eslint + typecheck + build.
-- `deploy.yml` (push to `develop` / `staging` / `main`): build the API Docker image → push to GHCR → SSH to the VM →
-  `docker compose up -d api-<env>`. Vercel deploys the web app by branch.
+- Render deploys the API and the voice relay from `render.yaml`. Vercel deploys the web app by branch.
 - `GET /health` returns `{env, version, gitSha}`, so you always know what's running where.
 - `scripts/release.sh` opens and merges the `develop → staging` / `staging → main` release PRs.
 
@@ -48,5 +47,5 @@ changed, and how it was tested.
 
 ## Secrets
 
-Never commit keys. Use `.env` locally (git-ignored), GitHub Environments in CI, and `/opt/rideout/<env>.env` on the
-VM. If a key is ever pasted in chat or committed, rotate it.
+Never commit keys. Use `.env` locally (git-ignored), GitHub Environments in CI, and the Render dashboard for
+the deployed services. If a key is ever pasted in chat or committed, rotate it.

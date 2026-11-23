@@ -58,7 +58,7 @@ export type FireView = {
   runId: string;
   label: string;
   simulated: true;
-  source: "tiger" | "model";
+  source: "model";
   ignition: [number, number];
   ignitedAt: string;
   endsAt: string;
@@ -90,7 +90,7 @@ export const api = {
   openRequests: () => call<Doc[]>("GET", "/requests/open"),
   vehicles: () => call<Doc[]>("GET", "/vehicles"),
   hazards: () => call<{ hazards: Doc[]; closures: Doc[]; shelters?: Doc[]; zones?: Doc[] }>("GET", "/hazards"),
-  /** The simulated fire as of `at` (ISO; default now). Detections from Tiger Data when configured. */
+  /** The simulated fire as of `at` (ISO; default now). Detections from the spread model. */
   fire: (at?: string) =>
     call<{ fire: FireView | null; reason?: string }>("GET", `/hazards/fire${at ? `?at=${encodeURIComponent(at)}` : ""}`),
   latestPlan: () => call<{ plan: Doc | null; assignments: Doc[] }>("GET", "/plans/latest"),

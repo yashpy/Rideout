@@ -9,7 +9,7 @@
 | `dialer.py` | Priority queue at SET, 1 call/s, reach ladder |
 | `callbacks.py` | Worker: `callbacks` with `state: queued` → place call → `played` / `unanswered` |
 | `dedupe.py` | Gemini embeddings + Atlas Vector Search + 50 m rule |
-| `zonewatch.py` | Reads county / drill Ready-Set-Go pages through TinyFish and starts dialing at SET |
+| `zone_status.py` | The one place a zone's Ready/Set/Go status changes (county webhook, drill page, fire); the dialer starts at SET |
 | `standin.py` | Simulated residents: answer the agent from their persona |
 | `session.py` | DB side of a call: loads/saves call state on `calls.agent`, PATCHes the record, syncs the request, logs turns |
 | `chat.py` | Text CLI: `uv run --project api python -m api.agent.chat` (from repo root). In-memory DB by default; `--url` to hit a running API; `-v` shows stage/status/record |

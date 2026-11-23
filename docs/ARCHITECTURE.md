@@ -37,7 +37,7 @@ Five rules hold the whole design together:
 | Resident | Any phone, including a landline | Phone call (ElevenLabs) | Answers questions, hears honest updates |
 | Dispatcher | Laptop | `/console`, `/calls` | Watches the map, approves plans, closes roads, reads safety alerts |
 | Driver | Smartphone | `/driver` (PWA) | Accepts offers, follows the run, confirms pickups, sends SOS |
-| County | Public web page | Ready/Set/Go status | Changes zone status (we read it with TinyFish) |
+| County | Public web page | Ready/Set/Go status | Changes zone status (posts it to the RideOut webhook) |
 | Visitor | Phone + laptop | `/` kiosk, `/system` | Gets called as a resident, inspects the numbers |
 
 ---
@@ -57,33 +57,28 @@ flowchart TB
     GM[Gemini API<br/>interpret · embed · vision]
     CA[Claude API<br/>fallback · eval grader]
     FI[NASA FIRMS<br/>satellite fire points]
-    TF[TinyFish<br/>web agent]
     CP[County / drill page<br/>Ready · Set · Go]
   end
 
   subgraph RideOut[RideOut]
     WEB[Web app<br/>Next.js on Vercel]
-    API[API<br/>FastAPI on Vultr]
+    API[API<br/>FastAPI on Render]
     WK[Workers<br/>dialer · callbacks · solver loop · hazard clock]
   end
 
   DB[(MongoDB Atlas)]
-  TS[(Tiger Data)]
 
   R <--> CL
   CL <-->|"/agent/start · /agent/turn"| API
   API --> GM
   API --> CA
   WK --> FI
-  TF -->|reads| CP
-  TF -->|"/zones/:id/status"| API
+  CP -->|"/zones/:id/status"| API
   DR <--> WEB
   DS <--> WEB
   WEB <-->|"REST + WebSocket /live"| API
   API <--> DB
   WK <--> DB
-  API --> TS
-  WK --> TS
   WK -->|outbound calls| CL
 ```
 
@@ -97,7 +92,7 @@ flowchart TB
 | **Agent service** | Turn handling: interpreter → state machine → templates → honesty guard → `say[]` | FastAPI, Gemini, Claude | `api/agent/` |
 | **Dialer + reach ladder** | Calls homes in priority order, retries, texts, door-check list | asyncio worker | `api/agent/dialer.py` |
 | **Callback worker** | Calls residents when their ride status changes | asyncio worker | `api/agent/callbacks.py` |
-| **Zone watcher** | Reads Ready/Set/Go pages with TinyFish and starts calls at SET | TinyFish + cron | `api/routes/zones.py` |
+| **Zone status** | County webhook and drill page set Ready/Set/Go; calls start at SET | FastAPI | `api/routes/zones.py`, `api/agent/zone_status.py` |
 | **Core rules** | Request status machine, offers, atomic accept, expiry, audit log | FastAPI, Motor | `api/requests.py`, `api/routes/assignments.py` |
 | **Live hub** | Turns Mongo change streams into WebSocket events | FastAPI WebSocket | `api/live.py` |
 | **Dispatcher (solver)** | Plans which vehicle picks up whom, re-plans on change | Python | `api/dispatch/` |
@@ -134,7 +129,7 @@ erDiagram
 - **Callback:** one phone call we owe a resident because their ride status changed. The unique key `request:assignment:status` makes callbacks idempotent.
 - **Plan:** one run of the solver (version, solver used, solve time, offers that changed).
 
-**Tiger Data** holds the fast-moving numbers: vehicle positions every second, fire detections, call-turn latency, and KPIs. MongoDB holds the state. Tiger Data holds the history. The `/system` page and the replay read from it.
+**MongoDB** holds the state and the call turns. The fire replay is computed from the seeded run, so it needs no separate store.
 
 ---
 
@@ -145,15 +140,13 @@ erDiagram
 ```mermaid
 sequenceDiagram
   participant CP as County / drill page
-  participant TF as TinyFish
   participant API as API
   participant DB as MongoDB
   participant DL as Dialer
   participant CL as ElevenLabs
   participant R as Resident
 
-  TF->>CP: read zone status (every 60 s)
-  TF->>API: POST /zones/oak_creek_14/status {set}
+  CP->>API: POST /zones/oak_creek_14/status {set}
   API->>DB: zone.status = set
   DB-->>DL: change stream: zone set
   DL->>DB: queue in-zone homes by priority (known needs first, earliest deadline)
@@ -200,7 +193,7 @@ sequenceDiagram
 | Templates (code) | Every sentence about ride status, ETA, driver name | — |
 | Honesty guard (code) | Drop an acknowledgment that sounds like a promise or contains digits | — |
 
-**Latency budget per turn:** interpreter ≤ 1.0 s at p50. If Gemini hasn't answered in 2.5 s, the same prompt goes to Claude Sonnet. Database writes and events are fire-and-forget. Each turn's latency is written to Tiger Data.
+**Latency budget per turn:** interpreter ≤ 1.0 s at p50. If Gemini hasn't answered in 2.5 s, the same prompt goes to Claude Sonnet. Database writes and events are fire-and-forget. Each turn's latency is logged on the call in MongoDB.
 
 ### 6.3 Request → plan → approve → accept → callback (the happy path)
 
@@ -408,47 +401,29 @@ stateDiagram-v2
 
 ```mermaid
 flowchart LR
-  GH["GitHub<br/>feat/* → develop → staging → main"] --> GA[GitHub Actions<br/>lint · test · build image]
-  GA -->|SSH deploy| VU
+  GH["GitHub<br/>feat/* → main"] --> GA[GitHub Actions<br/>lint · test]
+  GH -->|render.yaml blueprint| RD
   GH -->|branch deploys| VC
 
-  subgraph VU[Vultr VM · Docker Compose]
-    CD[Caddy<br/>auto-HTTPS]
-    A1[api-dev]
-    A2[api-staging]
-    A3[api-prod]
-    CD --> A1 & A2 & A3
+  subgraph RD[Render · free]
+    A1[rideout-api]
+    V1[rideout-voice]
   end
 
   subgraph VC[Vercel]
-    W1[dev.domain ← develop]
-    W2[staging.domain ← staging]
-    W3[app.domain ← main]
+    W1[web ← main, previews per PR]
   end
 
-  subgraph AT[MongoDB Atlas cluster]
-    D1[(rideout_dev)]
-    D2[(rideout_staging)]
-    D3[(rideout_prod)]
-  end
+  AT[(MongoDB Atlas)]
 
-  A1 --> D1
-  A2 --> D2
-  A3 --> D3
+  A1 --> AT
+  V1 --> A1
   W1 --> A1
-  W2 --> A2
-  W3 --> A3
 ```
 
-| Env | Branch | Web | API | DB | ElevenLabs agent |
-|---|---|---|---|---|---|
-| Development | `develop` | `dev.<domain>` | `api-dev.<domain>` | `rideout_dev` | `rideout-dev` (test phones) |
-| Testing | `staging` | `staging.<domain>` | `api-staging.<domain>` | `rideout_staging` | `rideout-dev` |
-| Production | `main` | `app.<domain>` | `api.<domain>` | `rideout_prod` | `rideout-prod` |
-
 - `GET /health` returns `{env, version, gitSha}`. Check it after every deploy.
-- Secrets live in GitHub Environments and `/opt/rideout/<env>.env` on the VM, never in git.
-- Rollback: re-run the deploy for the previous image tag (`ghcr.io/<org>/rideout-api:<sha>`).
+- Secrets live in GitHub Environments and the Render dashboard, never in git.
+- Rollback: redeploy an earlier commit from the Render dashboard.
 
 ---
 
@@ -469,7 +444,7 @@ flowchart LR
 
 ## 15. How this scales
 
-- **Calls:** voice agents are stateless per turn, so more calls means more ElevenLabs concurrency and more phone numbers (each number places 1 call per second). The API scales horizontally behind Caddy.
+- **Calls:** voice agents are stateless per turn, so more calls means more ElevenLabs concurrency and more phone numbers (each number places 1 call per second). The API scales horizontally behind a load balancer.
 - **Data:** one incident per zone document set. Shard by incident in a real deployment. Atlas change streams keep every screen in sync without polling.
 - **Solver:** one solver per zone, re-solving in seconds. Zones are independent, so they run in parallel.
 - **Agencies:** each agency runs its own instance on its own rider list. The dispatcher always approves, so the agency stays in control.

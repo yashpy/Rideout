@@ -13,7 +13,7 @@ pnpm lint && pnpm typecheck && pnpm build
 | `/driver` (PWA) | Offers, run, GPS, pickups, SOS, man-down (`app/driver/safety.ts`) |
 | `/calls` | Live calls, transcripts, records |
 | `/system` | Metrics, evals, simulated dispatch comparison, audit log |
-| `/drill` | Labeled drill page for the zone watcher (never styled as a county site) |
+| `/drill` | Labeled drill page that sets a test zone's status (never styled as a county site) |
 | `/report` | Photo hazard reports (placeholder) |
 
 - `lib/api.ts`: REST client for CONTRACT §2.

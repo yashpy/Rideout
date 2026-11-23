@@ -1,16 +1,8 @@
-"""Fire replay: the front agrees with every home's deadline; Tiger Data and the in-memory model agree.
+"""Fire replay: the front agrees with every home's deadline, and the map view matches the model."""
 
-The Tiger tests run only with TIGER_TEST_URL set to a Postgres with TimescaleDB, e.g.
-  TIGER_TEST_URL=postgres://postgres@localhost:5432/postgres uv run pytest tests/test_fire.py
-"""
-
-import os
 from datetime import UTC, timedelta
 
-import pytest
-
-from api.core.config import get_settings
-from api.hazard import fire, spread, tiger
+from api.hazard import fire, spread
 from api.sim import seed
 
 
@@ -52,7 +44,7 @@ def test_detections_are_deterministic_and_inside_the_front():
         assert spread.inside((d.lon, d.lat), spread.front(run, e + 3, points=360))
 
 
-async def test_fire_view_over_http_without_tiger(client, db):
+async def test_fire_view_over_http(client, db):
     await seed.seed(db, homes=60, rng_seed=3)
     run = await _run(db)
     res = await client.get("/hazards/fire", params={"at": (run.ignited_at - timedelta(minutes=10)).isoformat()})
@@ -70,58 +62,6 @@ async def test_fire_view_over_http_without_tiger(client, db):
 
 async def test_fire_view_before_any_seed(client):
     assert (await client.get("/hazards/fire")).json()["fire"] is None
-
-
-# ── Tiger Data (real TimescaleDB) ─────────────────────────────────────────────
-
-TIGER_URL = os.environ.get("TIGER_TEST_URL")
-needs_tiger = pytest.mark.skipif(not TIGER_URL, reason="set TIGER_TEST_URL to a Postgres with TimescaleDB")
-
-
-@pytest.fixture
-async def with_tiger(monkeypatch):
-    monkeypatch.setenv("TIGER_DATABASE_URL", TIGER_URL or "")
-    get_settings.cache_clear()
-    tiger._down_until = 0.0
-    yield
-    await tiger.close()
-    monkeypatch.setenv("TIGER_DATABASE_URL", "")
-    get_settings.cache_clear()
-
-
-@needs_tiger
-async def test_tiger_stores_the_run_and_matches_the_model(with_tiger, client, db):
-    await seed.seed(db, homes=60, rng_seed=3)
-    run = await _run(db)
-    assert await fire.publish(db, run) == "tiger"
-    assert (await db.hazards.find_one({"_id": fire.RUN_ID}))["store"] == "tiger"
-
-    at = run.ignited_at + timedelta(hours=3, minutes=7)
-    from_tiger = (await client.get("/hazards/fire", params={"at": at.isoformat()})).json()["fire"]
-    assert from_tiger["source"] == "tiger"
-
-    await db.hazards.update_one({"_id": fire.RUN_ID}, {"$set": {"store": "model"}})
-    from_model = (await client.get("/hazards/fire", params={"at": at.isoformat()})).json()["fire"]
-    assert from_model["source"] == "model"
-    for k in ("hotspots", "acres", "homesReached", "activity", "burned"):
-        assert from_tiger[k] == from_model[k], k
-    assert len(from_tiger["active"]) == len(from_model["active"])
-
-
-@needs_tiger
-async def test_tiger_reseed_replaces_this_envs_rows(with_tiger, db):
-    await seed.seed(db, homes=20, rng_seed=1)
-    first = await _run(db)
-    await fire.publish(db, first)
-    await seed.seed(db, homes=20, rng_seed=2)
-    second = await _run(db)
-    await fire.publish(db, second)
-    assert await tiger.read_until(first.run_id, first.ignited_at + timedelta(hours=9)) == {
-        "detections": [],
-        "activity": [],
-    }
-    data = await tiger.read_until(second.run_id, second.ignited_at + timedelta(hours=9))
-    assert len(data["detections"]) == len(spread.detections(second))
 
 
 # ── fire → zone status ────────────────────────────────────────────────────────

@@ -177,9 +177,9 @@ export function Console() {
   const vehicles = useLive((s) => s.vehicles);
   const liveZones = useLive((s) => s.zones);
   const liveHazards = useLive((s) => s.hazards);
-  // A new seed writes a new fire run (hazards/fire_run); its store flips to "tiger" once Tiger has it.
+  // A new seed writes a new fire run (hazards/fire_run); a reseed with the same seed keeps the runId.
   const fireRun = liveHazards["fire_run"] as Doc | undefined;
-  const fireRunKey = `${String(fireRun?.runId ?? "")}:${String(fireRun?.store ?? "")}`;
+  const fireRunKey = `${String(fireRun?.runId ?? "")}:${String(fireRun?.ignitedAt ?? "")}`;
   const plan = useLive((s) => s.plan);
   const { theme } = useTheme();
   const lastSafety = useLive((s) => s.safety[s.safety.length - 1]);
@@ -292,7 +292,7 @@ export function Console() {
   );
   // Zone outlines follow the fire on the map: neutral until the fire touches a zone, amber once it does,
   // red once it reaches the zone's homes (live, or as of the replay time when scrubbing). An evacuation order
-  // given before the fire gets there (TinyFish, a dispatcher) shows in the zone chips, not as a red outline.
+  // given before the fire gets there (the county, a dispatcher) shows in the zone chips, not as a red outline.
   const mapZones = useMemo(() => {
     if (!fireView?.zones) return zones;
     const lv = Object.fromEntries(fireView.zones.map((z) => [z.zoneId, z.level]));
