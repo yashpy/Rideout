@@ -80,8 +80,8 @@ export function Hero() {
             to them first, before the fire gets there.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/talk" className="btn btn-primary btn-lg">
-              Talk to RideOut <Arrow />
+            <Link href="/try" className="btn btn-primary btn-lg">
+              Try it: get the call <Arrow />
             </Link>
             <Link href="/console" className="btn btn-lg border-white/20! bg-white/5! text-white! hover:bg-white/10!">
               Open the dispatch console

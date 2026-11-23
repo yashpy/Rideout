@@ -181,9 +181,14 @@ async def web_call(body: WebBody) -> dict:
         if hh is None:
             raise HTTPException(404, "household not found")
     else:
+        # Skip homes whose ride is already under way (a driver accepted): they can't be replayed.
+        taken = await db.requests.distinct(
+            "householdId", {"status": {"$in": [st for st in rq.OPEN_STATUSES if st != "received"]}}
+        )
+        free = {"simulated": True, "_id": {"$nin": taken}}
         hh = await db.households.find_one(
-            {"simulated": True, "reach": "not_called"}, sort=[("fireArrivalAt", 1)]
-        ) or await db.households.find_one({"simulated": True, "reach": {"$nin": list(dialer.BUSY)}})
+            {**free, "reach": "not_called"}, sort=[("fireArrivalAt", 1)]
+        ) or await db.households.find_one({**free, "reach": {"$nin": list(dialer.BUSY)}})
         if hh is None:
             raise HTTPException(409, "no demo homes loaded; press Seed in the console first")
     if hh.get("reach") in dialer.BUSY:
