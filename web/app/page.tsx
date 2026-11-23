@@ -78,7 +78,7 @@ const TECH = [
   ["Anthropic Claude", "optional fallback interpreter and honesty judge"],
   ["TinyFish", "watches county evacuation pages for SET and GO"],
   ["Tiger Data", "fire detections in a TimescaleDB hypertable"],
-  ["Vultr", "the API, three environments behind Caddy"],
+  ["Render", "the API and the voice relay (free tier)"],
   ["Lovable.dev", "early UI prototype"],
   ["Vercel", "the web app, one deploy per branch"],
   ["MapLibre + deck.gl", "the maps, open data from OpenStreetMap"],
