@@ -334,8 +334,8 @@ export default function Landing() {
                 Play a resident who can&apos;t get out, or a neighbor with a free seat. It takes two minutes.
               </p>
             </div>
-            <Link href="/talk" className="btn btn-primary btn-lg">
-              Talk to RideOut <Arrow />
+            <Link href="/try" className="btn btn-primary btn-lg">
+              Try it now <Arrow />
             </Link>
           </div>
         </section>

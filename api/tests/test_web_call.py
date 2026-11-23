@@ -39,3 +39,16 @@ async def test_web_call_refuses_a_busy_house_and_rate_limits(client, db):
         await db.households.update_one({"_id": other["_id"]}, {"$set": {"reach": "not_called"}})
         assert (await client.post("/calls/web", json={"householdId": other["_id"]})).status_code == 200
     assert (await client.post("/calls/web", json={})).status_code == 429
+
+
+async def test_web_call_skips_homes_with_a_driver_on_the_way(client, db):
+    from api import requests as rq
+
+    busy = await make_household(db, simulated=True)
+    free = await make_household(db, simulated=True)
+    for h in (busy, free):
+        await db.households.update_one({"_id": h["_id"]}, {"$set": {"reach": "answered"}})
+    req = await rq.upsert_for_household(db, busy["_id"], need={"seats": 1})
+    await db.requests.update_one({"_id": req["_id"]}, {"$set": {"status": "driver_accepted"}})
+    r = await client.post("/calls/web", json={})
+    assert r.status_code == 200 and r.json()["householdId"] == free["_id"]

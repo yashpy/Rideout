@@ -164,8 +164,11 @@ export const api = {
       ...(place ?? {}),
     }),
   // "Talk to RideOut": a simulated home for a browser voice session (ElevenLabs widget → voice relay → agent)
-  webCall: (language: "en" | "es" = "en") =>
-    call<{ householdId: string; callId: string; address: string; language: string }>("POST", "/calls/web", { language }),
+  webCall: (language: "en" | "es" = "en", householdId?: string) =>
+    call<{ householdId: string; callId: string; address: string; language: string }>("POST", "/calls/web", {
+      language,
+      ...(householdId ? { householdId } : {}),
+    }),
   volunteer: (householdId: string, phone: string, place?: Place | null) =>
     call<{ vehicleId: string; driverName: string; address: string; driverUrl: string }>("POST", "/vehicles/volunteer", {
       householdId,

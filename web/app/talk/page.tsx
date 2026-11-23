@@ -8,41 +8,21 @@
  *      so every sentence you hear comes from the API's templates and honesty guard, as on a phone call;
  *   4) the transcript and the record fill in here live (/live).
  */
-import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { SimBadge } from "@/components/Shell";
 import { AppHeader } from "@/components/ui";
+import { VOICE_AGENT_ID as AGENT_ID, VoiceWidget, wakeVoiceRelay } from "@/components/VoiceWidget";
 import { ApiError, api, type HouseholdRecord } from "@/lib/api";
 import { useLive } from "@/lib/live";
 import { recordRows } from "../calls/format";
 
-const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID ?? "";
-const WIDGET_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed@0.25.1";
-// Free Render services sleep; wake the voice relay before the visitor speaks so ElevenLabs doesn't time out.
-const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL ?? "";
-
 type Turn = { callId: string; speaker: "agent" | "resident"; text: string; at?: string };
 type Session = { householdId: string; callId: string; address: string; language: string };
-
-declare module "react" {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      "elevenlabs-convai": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        "agent-id"?: string;
-        "dynamic-variables"?: string;
-        variant?: string;
-      };
-    }
-  }
-}
 
 export default function Talk() {
   const connect = useLive((s) => s.connect);
   useEffect(() => connect(), [connect]);
-  useEffect(() => {
-    if (VOICE_URL) fetch(`${VOICE_URL}/health`, { mode: "no-cors" }).catch(() => {});
-  }, []);
+  useEffect(() => wakeVoiceRelay(), []);
   const households = useLive((s) => s.households);
   const liveTurns = useLive((s) => s.turns);
   const [session, setSession] = useState<Session | null>(null);
@@ -66,15 +46,6 @@ export default function Talk() {
       setBusy(false);
     }
   }
-
-  const vars = session
-    ? JSON.stringify({
-        householdId: session.householdId,
-        callId: session.callId,
-        callType: "outbound",
-        language: session.language,
-      })
-    : "";
 
   return (
     <div className="min-h-dvh bg-bg">
@@ -110,8 +81,7 @@ export default function Talk() {
               <SimBadge />
             </div>
             <p className="text-sm text-muted">Press the call button at the bottom right, allow the microphone, then say hello.</p>
-            <Script src={WIDGET_SRC} strategy="afterInteractive" />
-            <elevenlabs-convai key={session.callId} agent-id={AGENT_ID} dynamic-variables={vars} />
+            <VoiceWidget householdId={session.householdId} callId={session.callId} language={session.language} />
 
             <section className="flex flex-col gap-2">
               <span className="eyebrow">Transcript</span>
