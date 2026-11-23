@@ -67,7 +67,7 @@ const SCREENS = [
   { href: "/calls", title: "Call floor", body: "Every call in progress, its transcript streaming in, and the household record filling as people talk." },
   { href: "/driver", title: "Driver app", body: "Offer with a countdown, accept, your run in order, seats this trip, and a one-hand SOS." },
   { href: "/system", title: "System & proof", body: "Latency, the honesty rate of the voice agent, and dispatch against today's first-come baseline." },
-  { href: "/drill", title: "Drill page", body: "A clearly labeled test zone page that our TinyFish agent reads the way it reads county pages." },
+  { href: "/drill", title: "Drill page", body: "A clearly labeled test zone page for testing zone status changes." },
 ];
 
 const TECH = [
@@ -75,8 +75,8 @@ const TECH = [
   ["ElevenLabs", "voice: listening and speaking on real phone calls"],
   ["Google Gemini", "understands each answer and fills the record"],
   ["Anthropic Claude", "optional fallback interpreter and honesty judge"],
-  ["TinyFish", "watches county evacuation pages for SET and GO"],
-  ["Tiger Data", "fire detections in a TimescaleDB hypertable"],
+  // ["TinyFish", "watches county evacuation pages for SET and GO"],
+  // ["Tiger Data", "fire detections in a TimescaleDB hypertable"],
   ["Vultr", "the API, three environments behind Caddy"],
   ["Vercel", "the web app, one deploy per branch"],
   ["MapLibre + deck.gl", "the maps, open data from OpenStreetMap"],
