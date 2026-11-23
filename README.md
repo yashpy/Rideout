@@ -7,6 +7,10 @@ When a zone goes to **SET**, RideOut calls every home in the zone at once, build
 plans pickups against each home's fire deadline, and tracks the drivers it sends toward the fire. Nobody is told help
 is coming until a driver has accepted.
 
+**Live demo:** [rideout-nine.vercel.app](https://rideout-nine.vercel.app) (main screen: `/console`) ·
+**API:** [rideout-api-grg6.onrender.com](https://rideout-api-grg6.onrender.com) (docs at `/docs`) ·
+**Hackathon submission:** [docs/SUBMISSION.md](docs/SUBMISSION.md)
+
 ---
 
 ## Contents
@@ -164,6 +168,7 @@ rideout/
 ├─ docs/
 │  ├─ ARCHITECTURE.md      ← how the system fits together
 │  ├─ CONTRACT.md          ← DB schema, status machine, API, events
+│  ├─ SUBMISSION.md        ← hackathon submission: demo scenarios, business model, video script
 │  ├─ simulation.md        ← impact simulation: settings, models, results
 │  └─ sources.md           ← primary sources for the scenario and population data
 ├─ api/                    ← FastAPI (Python 3.12)
