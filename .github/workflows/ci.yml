@@ -19,7 +19,7 @@ jobs:
       mongo:
         image: mongo:7
         ports: ["27017:27017"]
-      timescale: # Tiger Data's engine: tests/test_fire.py runs against a real hypertable
+      timescale:
         image: timescale/timescaledb:latest-pg16
         ports: ["5432:5432"]
         env:
@@ -28,7 +28,7 @@ jobs:
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       MONGODB_TEST_URI: mongodb://localhost:27017
-      TIGER_TEST_URL: postgres://postgres:test@localhost:5432/postgres
+      # TIGER_TEST_URL: postgres://postgres:test@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

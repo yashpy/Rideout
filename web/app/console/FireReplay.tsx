@@ -208,14 +208,14 @@ export function FireReplay({
           <span
             title={
               fire.source === "tiger"
-                ? "Detections read from Tiger Data (fire_detections hypertable, time_bucket activity)"
-                : "Tiger Data not configured or unreachable: same model computed in memory"
+                ? "Detections read from the external fire data store"
+                : "External fire data unavailable: same model computed in memory"
             }
             className={`rounded-full border px-1.5 py-px text-[10px] font-semibold tracking-[0.06em] ${
               fire.source === "tiger" ? "border-accent/50 text-accent" : "border-line text-muted"
             }`}
           >
-            {fire.source === "tiger" ? "TIGER DATA" : "MODEL"}
+            {fire.source === "tiger" ? "EXTERNAL DATA" : "MODEL"}
           </span>
           <button
             className={`btn min-h-7 px-2 text-[11px] ${at === null ? "border-fire/50 text-fire" : ""}`}
