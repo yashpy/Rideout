@@ -50,3 +50,13 @@ changed, and how it was tested.
 
 Never commit keys. Use `.env` locally (git-ignored), GitHub Environments in CI, and `/opt/rideout/<env>.env` on the
 VM. If a key is ever pasted in chat or committed, rotate it.
+
+## Getting started
+
+1. Pick or open an issue describing the change.
+2. Branch from `develop`: `git checkout develop && git pull && git checkout -b feat/<slug>`.
+3. Make small, focused commits using the conventions above.
+4. Run the same checks CI runs before pushing (API: `ruff` + `pytest`; web: `eslint`, typecheck, build).
+5. Open a PR into `develop` using the PR template and link the issue.
+
+Questions? Open a GitHub issue — we'd rather answer early than review a large surprise PR.
