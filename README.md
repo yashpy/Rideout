@@ -7,9 +7,12 @@ When a zone goes to **SET**, RideOut calls every home in the zone at once, build
 plans pickups against each home's fire deadline, and tracks the drivers it sends toward the fire. Nobody is told help
 is coming until a driver has accepted.
 
+**Demo video (4 min):** [youtu.be/MsPJStn0234](https://youtu.be/MsPJStn0234) ·
 **Live demo:** [rideout-nine.vercel.app](https://rideout-nine.vercel.app) (main screen: `/console`) ·
 **API:** [rideout-api-grg6.onrender.com](https://rideout-api-grg6.onrender.com) (docs at `/docs`) ·
 **Hackathon submission:** [docs/SUBMISSION.md](docs/SUBMISSION.md)
+
+[![Watch the RideOut demo video](https://img.youtube.com/vi/MsPJStn0234/hqdefault.jpg)](https://youtu.be/MsPJStn0234)
 
 ---
 
@@ -63,7 +66,7 @@ RideOut runs over plain voice calls, so residents need no app, no smartphone and
 
 - **Elderly first.** Callers aged 65+ are flagged `olderAdult` (shown as **65+** in the console) and planned earlier. Priority order is wheelchair/stretcher, then older adults, then everyone else without a ride. Within each group, the earliest fire deadline goes first. No vehicle ever goes over its seats or wheelchair spaces.
 - **Remote places 911 can't reach in time.** Canyons, tribal lands and rural counties where the nearest station is 45+ minutes away (Oak Creek Canyon: one road, and 1 in 8 residents has an ambulatory disability). Neighbors with trucks become the first responders. Close a road and the plan reroutes.
-- **Developing countries.** Cyclone and flood zones with no 911 and no dispatch software, but near-universal feature phones. An NGO or district officer starts a zone, the agent calls every number in the local language, and community vehicles (boats, trucks, tuk-tuks) are matched to the people who can't leave.
+- **Forest communities far from a fire station.** Rural and forest towns, in the US and in developing countries, where help takes longest and many people have only a basic phone. RideOut needs no app and no internet: the agent calls every number (English and Spanish today), and neighbors with a vehicle are matched to the people who can't leave.
 
 See [`docs/SUBMISSION.md`](docs/SUBMISSION.md) for demo scenarios and the business model.
 
