@@ -37,6 +37,7 @@ FIELDS = {
     "medical": {"oxygen", "dialysis", "other", "none"},
     "pets": bool,
     "hasCar": bool,
+    "olderAdult": bool,
 }
 
 
@@ -82,6 +83,7 @@ Fields you may set (use exactly these names and values), as "field=value" string
 - medical = oxygen | dialysis | other | none   (one entry per need)
 - pets = true | false
 - hasCar = true | false
+- olderAdult = true | false   (true if anyone at home is 65 or older: an age of 65+, "elderly", "senior")
 Only include facts stated or corrected in THIS utterance. A correction ("no wait, my son is here")
 overrides the record: set the new value. Put fields you inferred rather than heard in "guessed".
 
@@ -395,6 +397,8 @@ def rules(text: str, *, goal: str | None = None, language: str = "en") -> Interp
         it.set["pets"] = it.answer == "yes"
     elif _has(r"\b(dog|cat|dogs|cats|perro|gato|pets?)\b", t) and not is_no:
         it.set["pets"] = True
+    if _older_adult(t):
+        it.set["olderAdult"] = True
     if goal == "car" and it.answer != "unclear":
         it.set["hasCar"] = it.answer == "yes"
     if (
@@ -419,6 +423,22 @@ def rules(text: str, *, goal: str | None = None, language: str = "en") -> Interp
         elif it.answer == "no":
             it.set["assistance"] = "one_person"
     return it
+
+
+_AGE = re.compile(
+    r"\b(?:i'?m|i am|she'?s|he'?s|is|aged?|tengo|tiene)\s+(\d{2,3})\b|\b(\d{2,3})\s*(?:years? old|yrs? old|años)\b"
+)
+
+
+def _older_adult(t: str) -> bool:
+    """Someone at home is 65+: an age they say out loud, or a plain word for it. Never guessed from the voice."""
+    if _has(r"\b(elderly|senior citizen|i'?m (a )?senior|anciano|anciana|tercera edad|persona mayor)\b", t):
+        return True
+    for m in _AGE.finditer(t):
+        n = int(m.group(1) or m.group(2))
+        if 65 <= n <= 115:
+            return True
+    return False
 
 
 def _count(t: str) -> int | None:

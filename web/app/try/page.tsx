@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SimBadge } from "@/components/Shell";
 import { AppHeader, Arrow } from "@/components/ui";
+import { VOICE_AGENT_ID, VoiceWidget } from "@/components/VoiceWidget";
 import { ApiError, SCENARIOS, api, type HouseholdRecord, type Place, type Scenario } from "@/lib/api";
 import { useLive } from "@/lib/live";
 import { recordRows } from "../calls/format";
@@ -136,6 +137,8 @@ export default function Kiosk() {
   const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const [callId, setCallId] = useState<string | null>(null);
+  // No phone line yet: the same agent talks to you in the browser for the house you picked.
+  const [inBrowser, setInBrowser] = useState(false);
   const [driver, setDriver] = useState<{ vehicleId: string; driverUrl: string; driverName: string } | null>(null);
   const [hint, setHint] = useState<string | null>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -197,12 +200,30 @@ export default function Kiosk() {
     setError(null);
     try {
       const res = await api.kiosk(selected, e164, myPlace);
+      setSelected(res.householdId); // a busy house is swapped for the nearest free one
+      setInBrowser(false);
       setCallId(res.callId);
     } catch (e) {
+      if (e instanceof ApiError && e.status === 503 && VOICE_AGENT_ID) {
+        await talkInBrowser();
+        return;
+      }
       const msg = e instanceof ApiError ? e.message : "Something went wrong";
       setError(e instanceof ApiError && e.status === 503 ? "The phone line isn't set up yet." : msg);
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function talkInBrowser() {
+    if (!selected) return;
+    try {
+      const res = await api.webCall("en", selected);
+      setSelected(res.householdId);
+      setInBrowser(true);
+      setCallId(res.callId);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Something went wrong");
     }
   }
 
@@ -466,12 +487,18 @@ export default function Kiosk() {
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm text-white/70">
-                      {turns.length ? "You're talking to RideOut" : "Your phone should ring now"}
+                      {turns.length
+                        ? "You're talking to RideOut"
+                        : inBrowser
+                          ? "No phone line yet: talk here instead. Press Start a call, allow the microphone, say hello."
+                          : "Your phone should ring now"}
                     </p>
                     <p className="truncate text-lg font-semibold tracking-[-0.02em]">{home?.address}</p>
                   </div>
                 </div>
               </div>
+
+              {inBrowser && selected && callId && <VoiceWidget householdId={selected} callId={callId} language="en" />}
 
               <section className="flex flex-col gap-2">
                 <span className="eyebrow">Transcript</span>
@@ -525,6 +552,7 @@ export default function Kiosk() {
                 type="button"
                 onClick={() => {
                   setCallId(null);
+                  setInBrowser(false);
                   setSelected(null);
                 }}
                 className="btn btn-lg w-full"

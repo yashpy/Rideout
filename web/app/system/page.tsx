@@ -284,7 +284,11 @@ export default function SystemPage() {
                 <p className="text-sm leading-relaxed text-muted">
                   {script.personas} fictional personas (EN + ES) through the real agent. &quot;Own words&quot;: each persona
                   says its own lines whatever is asked. &quot;Direct&quot;: it answers each question. Corrections caught:{" "}
-                  {answers.correctionsCaught}. Interpreter: {m?.evals?.interpreterConfigured}.
+                  {answers.correctionsCaught}. Interpreter: {m?.evals?.interpreterConfigured}
+                  {m?.evals?.interpreterConfigured === "rules"
+                    ? " (the free keyword fallback, used when no model key is set; with GEMINI_API_KEY, Gemini reads free speech first)"
+                    : ""}
+                  .
                 </p>
               </>
             ) : (

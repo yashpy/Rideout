@@ -17,6 +17,7 @@ class Need(BaseModel):
     stretcher: int = 0
     crew: int = 1
     lift: bool = False
+    olderAdult: bool = False  # 65+: planned a little earlier, like people who cannot walk out
 
 
 class RideRequest(Doc):

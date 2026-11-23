@@ -140,7 +140,9 @@ export function useAnimatedNumber(value: number, ms = 700): number {
     const t0 = performance.now();
     let raf = 0;
     const step = (t: number) => {
-      const k = Math.min(1, (t - t0) / ms);
+      // rAF timestamps can predate t0; a negative k would swing the eased value the wrong way, and live
+      // updates restarting mid-animation compound it (the console once showed "-2465 homes").
+      const k = Math.max(0, Math.min(1, (t - t0) / ms));
       const eased = 1 - Math.pow(1 - k, 3);
       const v = start + (value - start) * eased;
       setShown(v);

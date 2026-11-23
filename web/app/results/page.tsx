@@ -14,7 +14,7 @@ import { SimBadge } from "@/components/Shell";
 import { AppHeader, Arrow } from "@/components/ui";
 import { api, type Evacuation } from "@/lib/api";
 
-// data/sim-results.json (generated 2026-11-15, gitSha a4de1ed): median and range across low/middle/high settings.
+// data/sim-results.json (generated 2026-11-22, gitSha a4de1ed): median and range across low/middle/high settings.
 const IMPACT = {
   label: "Oak Creek Canyon, 200 homes, 150 simulated runs",
   metric: "Share of people who needed a ride picked up before their deadline (10 min before the fire reaches the home)",

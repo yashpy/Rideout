@@ -7,18 +7,23 @@ When a zone goes to **SET**, RideOut calls every home in the zone at once, build
 plans pickups against each home's fire deadline, and tracks the drivers it sends toward the fire. Nobody is told help
 is coming until a driver has accepted.
 
+**Live demo:** [rideout-nine.vercel.app](https://rideout-nine.vercel.app) (main screen: `/console`) ·
+**API:** [rideout-api-grg6.onrender.com](https://rideout-api-grg6.onrender.com) (docs at `/docs`) ·
+**Hackathon submission:** [docs/SUBMISSION.md](docs/SUBMISSION.md)
+
 ---
 
 ## Contents
 1. [How it works](#how-it-works)
-2. [Architecture](#architecture)
-3. [Tech stack](#tech-stack)
-4. [Screens](#screens)
-5. [Algorithms](#algorithms)
-6. [Environments, branches, deploys](#environments-branches-deploys)
-7. [Repo layout](#repo-layout)
-8. [Run it locally](#run-it-locally)
-9. [Configuration](#configuration)
+2. [Use cases](#use-cases)
+3. [Architecture](#architecture)
+4. [Tech stack](#tech-stack)
+5. [Screens](#screens)
+6. [Algorithms](#algorithms)
+7. [Environments, branches, deploys](#environments-branches-deploys)
+8. [Repo layout](#repo-layout)
+9. [Run it locally](#run-it-locally)
+10. [Configuration](#configuration)
 
 ---
 
@@ -51,6 +56,16 @@ Fire map ─► deadline per home                         ▼
    If a road closes, the resident hears that at once and the request is re-planned.
 7. **Protect the drivers.** The driver app shows fire distance, flags routes into the fire buffer, and sends SOS or
    MAN DOWN (impact, then stillness) with coordinates to the dispatcher.
+
+## Use cases
+
+RideOut runs over plain voice calls, so residents need no app, no smartphone and no internet.
+
+- **Elderly first.** Callers aged 65+ are flagged `olderAdult` (shown as **65+** in the console) and planned earlier. Priority order is wheelchair/stretcher, then older adults, then everyone else without a ride. Within each group, the earliest fire deadline goes first. No vehicle ever goes over its seats or wheelchair spaces.
+- **Remote places 911 can't reach in time.** Canyons, tribal lands and rural counties where the nearest station is 45+ minutes away (Oak Creek Canyon: one road, and 1 in 8 residents has an ambulatory disability). Neighbors with trucks become the first responders. Close a road and the plan reroutes.
+- **Developing countries.** Cyclone and flood zones with no 911 and no dispatch software, but near-universal feature phones. An NGO or district officer starts a zone, the agent calls every number in the local language, and community vehicles (boats, trucks, tuk-tuks) are matched to the people who can't leave.
+
+See [`docs/SUBMISSION.md`](docs/SUBMISSION.md) for demo scenarios and the business model.
 
 ## Architecture
 
@@ -153,6 +168,7 @@ rideout/
 ├─ docs/
 │  ├─ ARCHITECTURE.md      ← how the system fits together
 │  ├─ CONTRACT.md          ← DB schema, status machine, API, events
+│  ├─ SUBMISSION.md        ← hackathon submission: demo scenarios, business model, video script
 │  ├─ simulation.md        ← impact simulation: settings, models, results
 │  └─ sources.md           ← primary sources for the scenario and population data
 ├─ api/                    ← FastAPI (Python 3.12)

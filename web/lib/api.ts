@@ -163,6 +163,12 @@ export const api = {
       phone,
       ...(place ?? {}),
     }),
+  // "Talk to RideOut": a simulated home for a browser voice session (ElevenLabs widget → voice relay → agent)
+  webCall: (language: "en" | "es" = "en", householdId?: string) =>
+    call<{ householdId: string; callId: string; address: string; language: string }>("POST", "/calls/web", {
+      language,
+      ...(householdId ? { householdId } : {}),
+    }),
   volunteer: (householdId: string, phone: string, place?: Place | null) =>
     call<{ vehicleId: string; driverName: string; address: string; driverUrl: string }>("POST", "/vehicles/volunteer", {
       householdId,
@@ -241,6 +247,7 @@ export type HouseholdRecord = {
   medical?: ("oxygen" | "dialysis" | "other")[];
   pets?: boolean;
   hasCar?: boolean;
+  olderAdult?: boolean;
   confidence?: Record<string, number>;
 };
 

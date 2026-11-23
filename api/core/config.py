@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import quote_plus
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,6 +16,8 @@ class Settings(BaseSettings):
     git_sha: str = "local"
 
     mongodb_uri: str = "mongodb://localhost:27017"
+    # Optional: keep the password out of MONGODB_URI. Put `<db_password>` in the URI and the password here.
+    mongodb_password: str = ""
     tiger_database_url: str = ""
 
     gemini_api_key: str = ""
@@ -57,6 +60,13 @@ class Settings(BaseSettings):
     # Background workers (offer expiry, change streams). Off in tests.
     run_workers: bool = True
     offer_ttl_seconds: int = 120
+
+    @property
+    def mongo_url(self) -> str:
+        """MONGODB_URI with `<db_password>` replaced by MONGODB_PASSWORD (URL-encoded)."""
+        if self.mongodb_password and "<db_password>" in self.mongodb_uri:
+            return self.mongodb_uri.replace("<db_password>", quote_plus(self.mongodb_password))
+        return self.mongodb_uri
 
     @property
     def db_name(self) -> str:

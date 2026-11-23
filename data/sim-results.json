@@ -3,7 +3,7 @@
   "simulated": true,
   "label": "Simulated: 200 homes, Oak Creek Canyon scenario",
   "metric": "Share of people who needed a ride picked up before their deadline (10 min before the fire reaches the home). Not lives saved; not a forecast.",
-  "generatedAt": "2026-11-15T02:17:13Z",
+  "generatedAt": "2026-11-22T02:17:13Z",
   "gitSha": "a4de1ed",
   "seedsPerColumn": 50,
   "runs": 150,

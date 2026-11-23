@@ -27,6 +27,7 @@ DB name = `rideout_${ENV}` (`dev`, `staging`, `prod`). All geometry is GeoJSON. 
     "medical": ["oxygen"],        // oxygen | dialysis | other
     "pets": true,
     "hasCar": false,
+    "olderAdult": true,           // additive: someone at home is 65+ (only when said on the call)
     "confidence": { "mobility": 0.9 }
   },
   "corrections": [ { "field": "peopleCount", "from": 1, "to": 2, "at": "..." } ],
@@ -46,7 +47,7 @@ DB name = `rideout_${ENV}` (`dev`, `staging`, `prod`). All geometry is GeoJSON. 
 {
   "_id": "rq_...", "householdId": "hh_...",
   "status": "received|approved|driver_accepted|en_route|arrived|closed|reassigning",
-  "need": { "seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": true },
+  "need": { "seats": 2, "wheelchair": 1, "stretcher": 0, "crew": 2, "lift": true, "olderAdult": false },  // olderAdult: additive, 15-min planning head start
   "deadlineAt": "ISO", "priority": 0.0,
   "escalation": null,            // medical | flames | address_unconfirmed | unservable | language
   "dupOf": null,                 // set by dedupe
@@ -130,6 +131,7 @@ Auth: dashboard and driver endpoints are open (no sign-in yet). `/agent/*` and w
 | POST | `/agent/turn` | `{callId, householdId, text, language}` → `{say: [str], stage, done, record, requestStatus}` |
 | POST | `/calls/kiosk` | `{householdId, phone: +1XXXXXXXXXX, address?, lon?, lat?}` (*added:* a typed, geocoded address moves the house there; 422 if more than 2.5 km away) → `{callId, householdId, address}`: the house becomes the caller's real phone, then is dialed. 429 above 6/min |
 | POST | `/calls/dial` | `{householdId}` → `{callId}` (real call via ElevenLabs, or stand-in) |
+| POST | `/calls/web` | *added:* `{householdId?, language?: en|es}` → `{householdId, callId, address, language}`: a simulated home prepared for a browser voice session (ElevenLabs widget → voice relay → `/agent/*`). 409 busy house, 429 above 6/min |
 | GET | `/calls?limit=` | → `[call summary + household]`, most recently active first |
 | GET | `/calls/{id}` | → call summary + `turns` + open `request` |
 | PATCH | `/households/{id}/record` | partial record → household |

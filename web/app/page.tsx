@@ -62,6 +62,7 @@ const STEPS = [
 ];
 
 const SCREENS = [
+  { href: "/talk", title: "Talk to RideOut", body: "Speak to the real voice agent in your browser as a resident. Watch the record fill in as you talk." },
   { href: "/try", title: "Try it", body: "Enter your phone number and your address, then take the call as a resident or join as a driver." },
   { href: "/console", title: "Dispatch console", body: "The live map: requests by deadline, the plan to approve, the fleet, and Play evacuation." },
   { href: "/calls", title: "Call floor", body: "Every call in progress, its transcript streaming in, and the household record filling as people talk." },
@@ -78,6 +79,8 @@ const TECH = [
   // ["TinyFish", "watches county evacuation pages for SET and GO"],
   // ["Tiger Data", "fire detections in a TimescaleDB hypertable"],
   ["Vultr", "the API, three environments behind Caddy"],
+  ["Render", "the API and the voice relay (free tier)"],
+  ["Lovable.dev", "early UI prototype"],
   ["Vercel", "the web app, one deploy per branch"],
   ["MapLibre + deck.gl", "the maps, open data from OpenStreetMap"],
 ];
@@ -99,6 +102,32 @@ const FAQ = [
     "Is the data real?",
     "The fire, homes and people in this demo are simulated, and labeled SIM everywhere. Calls to your own phone in Try it are real. The scenario numbers follow public Census rates and published response figures (see About).",
   ],
+];
+
+const SCENARIOS_DEMO: { tag: string; title: string; body: string; how: string; cta: string; href?: string }[] = [
+  {
+    tag: "Older adults first",
+    title: "An 82-year-old with a walker and no car",
+    body: "She tells the agent her age, that she uses a walker, and that she can't drive. The record fills itself in while she talks.",
+    how: "Her request is tagged 65+ and planned ahead of able-bodied riders with the same fire deadline. She hears about a ride only once a real driver has accepted.",
+    cta: "Open the console (North Scottsdale, Seed, Instant census)",
+    href: "/console",
+  },
+  {
+    tag: "Remote canyon",
+    title: "One road in, help 45 minutes away",
+    body: "In a canyon like Oak Creek, crews can't knock on every door before the fire arrives, and 911 hears about people too late.",
+    how: "RideOut calls every home on the road at once. Neighbors with trucks get matched to people who can't leave. Close a road and the plan reroutes. Homes that never answer go on the door-knock list.",
+    cta: "Open the console (Oak Creek Canyon, Close a road, Solve now)",
+    href: "/console",
+  },
+  {
+    tag: "Next market · not simulated yet",
+    title: "Villages with no 911",
+    body: "Before a cyclone or flood, many places have no central dispatch, but almost everyone has a basic phone.",
+    how: "A district officer or NGO starts a zone. The agent calls the village registry, finds who is elderly or disabled and who has a boat or truck, and matches them to shelters. English and Spanish today; more languages need only a voice and translated templates.",
+    cta: "Same engine, new region: a local number and a language.",
+  },
 ];
 
 export default function Landing() {
@@ -165,6 +194,7 @@ export default function Landing() {
                 ["Weighted waiting", "Each minute a wheelchair rider waits counts double; a stretcher rider's counts four times."],
                 ["Reserved vehicles", "Ambulances and lift vans don't take someone who can walk while anyone who needs them is waiting."],
                 ["Seats per trip", "A full vehicle drops off at a shelter before its next pickup. No car ever carries more than it holds."],
+                ["Older adults next", "Riders 65 and older who can walk are planned 15 minutes early, right after wheelchair and stretcher riders. Only when they tell us their age."],
               ].map(([t, b]) => (
                 <li key={t} className="card p-5">
                   <h3 className="font-semibold text-ink">{t}</h3>
@@ -201,6 +231,31 @@ export default function Landing() {
                 Press Play evacuation in the console to watch one.
               </p>
             </div>
+          </div>
+        </Section>
+
+        <Section
+          id="where"
+          eyebrow="Where it works"
+          title="Anywhere people have a phone."
+          lead="RideOut needs no app and no internet on the resident's side. It is an ordinary phone call, so it reaches landlines and basic phones."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            {SCENARIOS_DEMO.map((s) => (
+              <article key={s.title} className="card flex flex-col p-6">
+                <span className="eyebrow text-muted">{s.tag}</span>
+                <h3 className="mt-3 text-[17px] font-semibold tracking-[-0.01em] text-ink">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink">{s.how}</p>
+                {s.href ? (
+                  <Link href={s.href} className="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-accent">
+                    {s.cta} <Arrow />
+                  </Link>
+                ) : (
+                  <span className="mt-auto pt-5 text-xs text-muted">{s.cta}</span>
+                )}
+              </article>
+            ))}
           </div>
         </Section>
 
