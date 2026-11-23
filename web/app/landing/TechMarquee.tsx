@@ -17,6 +17,7 @@ const TECH = [
   "deck.gl",
   "OpenStreetMap",
   "GitHub Actions",
+  "Lovable (early prototype)",
 ];
 
 export function TechMarquee() {
