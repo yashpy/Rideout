@@ -67,6 +67,33 @@ async def get_call(call_id: str) -> dict:
     return {**_summary(call, hh), "turns": call.get("turns") or [], "request": out(req)}
 
 
+async def _taken(db: Any) -> list[str]:
+    """Homes whose ride is under way (a driver accepted): a visitor can't take them over."""
+    live = [st for st in rq.OPEN_STATUSES if st != "received"]
+    return await db.requests.distinct("householdId", {"status": {"$in": live}})
+
+
+async def playable(db: Any, hh: dict[str, Any]) -> dict[str, Any]:
+    """`hh` if a visitor can play it, else the nearest simulated home that is free (not on a call, no driver on
+    the way). Visitors tap houses mid-evacuation; refusing them ("pick another one") was a dead end."""
+    taken = await _taken(db)
+    if hh.get("reach") not in dialer.BUSY and hh["_id"] not in taken:
+        return hh
+    here = (hh.get("location") or {}).get("coordinates") or [0.0, 0.0]
+    best, best_d = None, float("inf")
+    query = {"simulated": True, "_id": {"$nin": [*taken, hh["_id"]]}, "reach": {"$nin": list(dialer.BUSY)}}
+    async for h in db.households.find(query, {"location": 1}):
+        c = (h.get("location") or {}).get("coordinates")
+        if not c:
+            continue
+        d = (c[0] - here[0]) ** 2 + ((c[1] - here[1]) * 1.2) ** 2
+        if d < best_d:
+            best, best_d = h["_id"], d
+    if best is None:
+        raise HTTPException(409, "every demo home is busy right now; press Seed in the console to reset them")
+    return await db.households.find_one({"_id": best})
+
+
 class KioskBody(BaseModel):
     householdId: str
     phone: str = Field(pattern=r"^\+1\d{10}$", description="US number in E.164, e.g. +14805551234")
@@ -98,14 +125,11 @@ async def kiosk(body: KioskBody) -> dict:
     hh = await db.households.find_one({"_id": body.householdId})
     if hh is None:
         raise HTTPException(404, "household not found")
-    if hh.get("reach") in dialer.BUSY:
-        raise HTTPException(409, "this house is on a call right now; pick another one")
+    hh = await playable(db, hh)  # busy house: the nearest free one instead
     typed = bool(body.address)
     hh = await place_visitor(db, hh, body.address, body.lon, body.lat)
     req = await db.requests.find_one({"householdId": hh["_id"], "status": {"$in": list(rq.OPEN_STATUSES)}})
-    if req is not None:
-        if req["status"] != "received":
-            raise HTTPException(409, "this house already has a driver on the way; pick another one")
+    if req is not None and req["status"] == "received":
         await rq.transition(db, req["_id"], "closed", reason="kiosk: a visitor plays this home", by="kiosk")
     await db.households.update_one(
         {"_id": hh["_id"]},
@@ -180,6 +204,7 @@ async def web_call(body: WebBody) -> dict:
         hh = await db.households.find_one({"_id": body.householdId})
         if hh is None:
             raise HTTPException(404, "household not found")
+        hh = await playable(db, hh)
     else:
         # Skip homes whose ride is already under way (a driver accepted): they can't be replayed.
         taken = await db.requests.distinct(
@@ -191,12 +216,8 @@ async def web_call(body: WebBody) -> dict:
         ) or await db.households.find_one({**free, "reach": {"$nin": list(dialer.BUSY)}})
         if hh is None:
             raise HTTPException(409, "no demo homes loaded; press Seed in the console first")
-    if hh.get("reach") in dialer.BUSY:
-        raise HTTPException(409, "this house is on a call right now; pick another one")
     req = await db.requests.find_one({"householdId": hh["_id"], "status": {"$in": list(rq.OPEN_STATUSES)}})
-    if req is not None:
-        if req["status"] != "received":
-            raise HTTPException(409, "this house already has a driver on the way; pick another one")
+    if req is not None and req["status"] == "received":
         await rq.transition(db, req["_id"], "closed", reason="web voice: a visitor plays this home", by="web")
     await db.households.update_one(
         {"_id": hh["_id"]},
